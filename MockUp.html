@@ -1,0 +1,458 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>もうひとねむり（仮）</title>
+    <style>
+        /* --- 基本設定 --- */
+        :root {
+            --bg-sleep: #1a2a6c;
+            --bg-run: #b21f1f;
+            --text-color: #ffffff;
+            --accent-color: #fdbb2d;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background-color: #222;
+            color: var(--text-color);
+            overflow: hidden; /* スクロール禁止 */
+            touch-action: manipulation; /* スマホでのダブルタップ拡大防止 */
+            user-select: none; /* テキスト選択防止 */
+            -webkit-user-select: none;
+        }
+
+        #game-container {
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            position: relative;
+            transition: background 0.5s ease;
+        }
+
+        /* --- 共通UIパーツ --- */
+        h1 { font-size: 24px; margin-bottom: 10px; }
+        p { font-size: 16px; line-height: 1.5; margin: 10px 20px; }
+
+        .emoji-display {
+            font-size: 80px;
+            margin: 20px 0;
+            display: block;
+        }
+
+        .btn {
+            background-color: var(--accent-color);
+            color: #333;
+            border: none;
+            border-radius: 50px;
+            padding: 15px 40px;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #cba018;
+            transition: transform 0.1s;
+            margin-top: 20px;
+            width: 80%;
+            max-width: 300px;
+        }
+
+        .btn:active {
+            transform: translateY(4px);
+            box-shadow: none;
+        }
+
+        .hidden { display: none !important; }
+
+        /* --- フェーズ別のスタイル --- */
+
+        /* タイトル画面 */
+        #title-screen { background: linear-gradient(to bottom, #200122, #6f0000); }
+
+        /* おやすみフェーズ */
+        .phase-sleep {
+            background: linear-gradient(to bottom, #0f2027, #203a43, #2c5364);
+        }
+
+        .sleep-score {
+            font-size: 1.5rem;
+            color: #88ffcc;
+            margin-top: 10px;
+        }
+
+        .multiplier-display {
+            font-size: 1rem;
+            color: #ffd700;
+        }
+
+        /* 遅刻回避フェーズ */
+        .phase-run {
+            background: linear-gradient(to bottom, #cb2d3e, #ef473a);
+        }
+        /* 走る時の振動アニメーション */
+        .shake {
+            animation: shake 0.2s cubic-bezier(.36,.07,.19,.97) both;
+        }
+
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-2px, 0, 0); }
+            20%, 80% { transform: translate3d(4px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-6px, 0, 0); }
+            40%, 60% { transform: translate3d(6px, 0, 0); }
+        }
+
+        /* ゲージ類 */
+        #timer-bar-container {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            height: 20px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        #timer-bar {
+            height: 100%;
+            background-color: #00ff00;
+            width: 100%;
+            transition: width 0.1s linear, background-color 0.5s;
+        }
+
+        #progress-container {
+            width: 80%;
+            max-width: 400px;
+            height: 10px;
+            background: rgba(0,0,0,0.3);
+            margin: 10px auto;
+            border-radius: 5px;
+            position: relative;
+        }
+        #progress-bar {
+            height: 100%;
+            background-color: var(--accent-color);
+            width: 0%;
+            border-radius: 5px;
+            transition: width 0.05s ease-out;
+        }
+
+        /* ステータス表示 */
+        #status-hud {
+            position: absolute;
+            top: 50px;
+            width: 100%;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            text-shadow: 1px 1px 2px black;
+        }
+
+    </style>
+</head>
+<body>
+
+<div id="game-container">
+
+    <div id="screen-title">
+        <div class="emoji-display">🏢🛌🏃</div>
+        <h1>もうひとねむり（仮）</h1>
+        <p>私/俺は限界社会人。<br>今日も夜遅くまで働いていた。<br>眠い！1秒でも長く寝ていたい！<br>ギリギリまで寝かせてくれ～！！！！</p>
+        <button class="btn" onclick="game.startSleepPhase()">出社準備（就寝）</button>
+        <p style="font-size:12px; opacity:0.7;">※音は出ません</p>
+    </div>
+
+    <div id="ui-overlay" class="hidden">
+        <div id="timer-bar-container"><div id="timer-bar"></div></div>
+        <div id="status-hud">遅刻まで <span id="time-text">40.00</span> 秒</div>
+    </div>
+
+    <div id="screen-sleep" class="hidden">
+        <div class="emoji-display" id="sleep-emoji">🛌</div>
+        <h2>睡眠中...</h2>
+        <div class="multiplier-display">睡眠倍率: <span id="sleep-mult">1.0</span>倍</div>
+        <div class="sleep-score">暫定スコア: <span id="current-sleep-score">0</span></div>
+        <p>寝れば寝るほどスコアアップ！<br>でも遅刻したら終わりだ！</p>
+        <button class="btn" style="background-color: #ff6b6b; color:white;" onclick="game.wakeUp()">起きる！！！</button>
+    </div>
+
+    <div id="screen-run" class="hidden">
+        <div class="emoji-display" id="run-emoji">🏃💨</div>
+        <h2>駅までダッシュ！</h2>
+        <div id="progress-container">
+            <div id="progress-bar"></div>
+        </div>
+        <p>連打して会社へ急げ！</p>
+        <button class="btn" id="btn-run">走る（連打）！</button>
+    </div>
+
+    <div id="screen-result" class="hidden">
+        <div class="emoji-display" id="result-emoji">🤔</div>
+        <h2 id="result-title">結果発表</h2>
+        <p id="result-msg">メッセージ</p>
+        <div style="font-size: 24px; font-weight: bold; margin: 20px;">
+            スコア: <span id="final-score">0</span> 点
+        </div>
+        <div style="text-align: left; display: inline-block; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 10px;">
+            <div>💤 睡眠スコア: <span id="res-sleep">0</span></div>
+            <div>⏱ 残り時間ボナ: <span id="res-time">0</span></div>
+        </div>
+        <br>
+        <button class="btn" onclick="game.reset()">もう一度寝る</button>
+    </div>
+
+</div>
+
+<script>
+    /**
+     * ゲーム設定とロジック
+     */
+    class Game {
+        constructor() {
+            // 設定値
+            this.TOTAL_TIME = 40.0; // 制限時間（秒）
+            this.GOAL_DISTANCE = 80; // 駅までの必要連打数
+            this.TIME_BONUS_MULTIPLIER = 500; // 残り時間1秒あたりのボーナス
+
+            // 状態変数
+            this.state = 'title'; // title, sleep, run, result
+            this.startTime = 0;
+            this.timeRemaining = 0;
+            this.sleepScore = 0;
+            this.sleepDuration = 0; // 寝ていた時間
+            this.currentDistance = 0;
+            this.animationFrameId = null;
+
+            // DOM要素
+            this.screens = {
+                title: document.getElementById('screen-title'),
+                sleep: document.getElementById('screen-sleep'),
+                run: document.getElementById('screen-run'),
+                result: document.getElementById('screen-result')
+            };
+            this.uiOverlay = document.getElementById('ui-overlay');
+            this.timerBar = document.getElementById('timer-bar');
+            this.timeText = document.getElementById('time-text');
+            this.container = document.getElementById('game-container');
+
+            // イベントリスナー設定
+            document.getElementById('btn-run').addEventListener('touchstart', (e) => {
+                e.preventDefault(); // スマホでの拡大防止
+                this.runAction();
+            });
+            document.getElementById('btn-run').addEventListener('click', () => this.runAction());
+        }
+
+        // 画面切り替え
+        switchScreen(screenName) {
+            Object.values(this.screens).forEach(el => el.classList.add('hidden'));
+            this.screens[screenName].classList.remove('hidden');
+
+            // 背景色の変更（雰囲気づくり）
+            this.container.className = ''; // クラスリセット
+            if(screenName === 'sleep') this.container.classList.add('phase-sleep');
+            if(screenName === 'run') this.container.classList.add('phase-run');
+        }
+
+        // --- A. ゲーム開始（おやすみフェーズへ） ---
+        startSleepPhase() {
+            this.state = 'sleep';
+            this.sleepScore = 0;
+            this.sleepDuration = 0;
+            this.currentDistance = 0;
+            this.startTime = Date.now();
+
+            this.switchScreen('sleep');
+            this.uiOverlay.classList.remove('hidden');
+
+            this.loop();
+        }
+
+        // --- B. 睡眠中の処理 ---
+        updateSleep(elapsedTime) {
+            this.sleepDuration = elapsedTime;
+
+            // スコア計算ロジック
+            // 10秒までは x1.0, 20秒までは x2.0, それ以降は x5.0 (リスク推奨)
+            let multiplier = 1.0;
+            let baseScorePerFrame = 1; // 適当なベース値
+
+            if (this.sleepDuration > 25) {
+                multiplier = 10.0; // 超ギリギリボーナス
+            } else if (this.sleepDuration > 15) {
+                multiplier = 3.0;
+            } else if (this.sleepDuration > 5) {
+                multiplier = 1.5;
+            }
+
+            // スコア加算 (フレーム毎に加算すると大変なので、経過時間ベースで簡易表示計算)
+            // 実際には「現在の睡眠時間」に基づいてスコアを算出する関数を通す
+            this.sleepScore = Math.floor(this.calculateSleepScore(this.sleepDuration));
+
+            // 表示更新
+            document.getElementById('sleep-mult').innerText = multiplier.toFixed(1);
+            document.getElementById('current-sleep-score').innerText = this.sleepScore.toLocaleString();
+
+            // 演出: 呼吸アニメーション
+            const scale = 1 + Math.sin(Date.now() / 500) * 0.1;
+            document.getElementById('sleep-emoji').style.transform = `scale(${scale})`;
+        }
+
+        calculateSleepScore(durationSec) {
+            // 指数関数的に増えるスコア計算
+            // t = 秒数
+            // Score = t * 100 * (1 + t/10) みたいなカーブ
+            return Math.floor(durationSec * 100 * (1 + (durationSec * durationSec) / 100));
+        }
+
+        wakeUp() {
+            if (this.state !== 'sleep') return;
+            this.state = 'run';
+            this.switchScreen('run');
+        }
+
+        // --- C. 遅刻回避フェーズ（ダッシュ） ---
+        updateRun() {
+            // 演出: 走るエフェクト（自動では動かない、ボタン連打で動く）
+        }
+
+        runAction() {
+            if (this.state !== 'run') return;
+
+            this.currentDistance++;
+
+            // プログレスバー更新
+            const progressPercent = (this.currentDistance / this.GOAL_DISTANCE) * 100;
+            document.getElementById('progress-bar').style.width = `${progressPercent}%`;
+
+            // キャラクター振動
+            const emoji = document.getElementById('run-emoji');
+            emoji.classList.remove('shake');
+            void emoji.offsetWidth; // リフロー発生
+            emoji.classList.add('shake');
+
+            // クリア判定
+            if (this.currentDistance >= this.GOAL_DISTANCE) {
+                this.gameClear();
+            }
+        }
+
+        // --- メインループ ---
+        loop() {
+            if (this.state === 'result' || this.state === 'title') return;
+
+            const now = Date.now();
+            const elapsedSec = (now - this.startTime) / 1000;
+            this.timeRemaining = Math.max(0, this.TOTAL_TIME - elapsedSec);
+
+            // タイマー更新UI
+            this.timeText.innerText = this.timeRemaining.toFixed(2);
+            const timePercent = (this.timeRemaining / this.TOTAL_TIME) * 100;
+            this.timerBar.style.width = `${timePercent}%`;
+
+            // タイマー色変化
+            if (this.timeRemaining < 10) {
+                this.timerBar.style.backgroundColor = '#ff0000';
+                this.timeText.style.color = '#ff0000';
+            } else if (this.timeRemaining < 20) {
+                this.timerBar.style.backgroundColor = '#ffff00';
+            } else {
+                this.timerBar.style.backgroundColor = '#00ff00';
+                this.timeText.style.color = 'white';
+            }
+
+            // 時間切れ判定
+            if (this.timeRemaining <= 0) {
+                this.gameOver();
+                return;
+            }
+
+            // フェーズごとの処理
+            if (this.state === 'sleep') {
+                this.updateSleep(elapsedSec);
+            } else if (this.state === 'run') {
+                this.updateRun();
+            }
+
+            this.animationFrameId = requestAnimationFrame(() => this.loop());
+        }
+
+        // --- D. 結果画面 ---
+
+        // クリア（間に合った）
+        gameClear() {
+            cancelAnimationFrame(this.animationFrameId);
+            this.state = 'result';
+
+            const timeBonus = Math.floor(this.timeRemaining * this.TIME_BONUS_MULTIPLIER);
+            const totalScore = this.sleepScore + timeBonus;
+
+            this.showResult(
+                "間に合った！",
+                "🏢",
+                totalScore,
+                this.sleepScore,
+                timeBonus,
+                "#4CAF50" // Success Green
+            );
+        }
+
+        // ゲームオーバー（遅刻）
+        gameOver() {
+            cancelAnimationFrame(this.animationFrameId);
+            this.state = 'result';
+
+            let reason = "";
+            if (this.currentDistance < this.GOAL_DISTANCE && this.sleepDuration < this.TOTAL_TIME) {
+                reason = "走るのが遅かった...";
+            } else {
+                reason = "寝過ごした...";
+            }
+
+            this.showResult(
+                `遅刻確定...\n(${reason})`,
+                "💀",
+                0,
+                this.sleepScore,
+                0,
+                "#555" // Dead Gray
+            );
+        }
+
+        showResult(title, emoji, total, sleepPt, timePt, color) {
+            this.switchScreen('result');
+            this.uiOverlay.classList.add('hidden');
+            this.container.style.background = "#222"; // リセット
+
+            document.getElementById('result-title').innerText = title;
+            document.getElementById('result-title').style.color = color;
+            document.getElementById('result-emoji').innerText = emoji;
+            document.getElementById('result-msg').innerText = total > 0 ? "今日も一日がんばりましょう。" : "あなたは職を失うかもしれません。";
+
+            document.getElementById('final-score').innerText = total.toLocaleString();
+            document.getElementById('res-sleep').innerText = sleepPt.toLocaleString();
+            document.getElementById('res-time').innerText = timePt.toLocaleString();
+        }
+
+        reset() {
+            this.switchScreen('title');
+            this.state = 'title';
+            this.container.style.background = ""; // リセット
+            // プログレスバーリセット
+            document.getElementById('progress-bar').style.width = '0%';
+            document.getElementById('timer-bar').style.backgroundColor = '#00ff00';
+            document.getElementById('time-text').style.color = 'white';
+        }
+    }
+
+    // ゲームインスタンス作成
+    const game = new Game();
+
+</script>
+</body>
+</html>
