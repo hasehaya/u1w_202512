@@ -1,0 +1,641 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>もうひとねむり - Limit Socialite's Sleep Dash</title>
+    <style>
+        /* --- Reset & Base Styles --- */
+        * { box-sizing: border-box; touch-action: manipulation; user-select: none; -webkit-user-select: none; }
+        body { margin: 0; padding: 0; font-family: "Helvetica Neue", Arial, sans-serif; background-color: #333; color: #333; overflow: hidden; height: 100vh; display: flex; justify-content: center; align-items: center; }
+
+        /* --- Game Container --- */
+        #game-container {
+            width: 100%;
+            height: 100%;
+            max-width: 500px;
+            background-color: #fff;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        }
+
+        /* --- Common UI --- */
+        .scene {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            text-align: center;
+        }
+        .active { display: flex; }
+
+        h1, h2, h3 { margin: 0 0 15px 0; }
+        p { line-height: 1.6; margin-bottom: 20px; }
+
+        button {
+            background-color: #333;
+            color: #fff;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.1s, opacity 0.2s;
+            font-weight: bold;
+            box-shadow: 0 4px 0 #000;
+        }
+        button:active { transform: translateY(4px); box-shadow: none; }
+        button:disabled { background-color: #ccc; box-shadow: none; transform: translateY(4px); cursor: not-allowed; }
+
+        /* --- 1. Title Scene --- */
+        #scene-title { background-color: #FFD700; color: #333; }
+        .title-logo { font-size: 2.5rem; font-weight: 900; margin-bottom: 20px; text-shadow: 2px 2px 0 #fff; }
+        .hero-img { font-size: 5rem; margin-bottom: 30px; animation: sleepBreath 3s infinite ease-in-out; }
+        @keyframes sleepBreath { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+
+        /* --- 2. Prologue Scene --- */
+        #scene-prologue { background-color: #fff; color: #000; justify-content: center; }
+        .story-text { font-size: 1rem; text-align: left; background: #f9f9f9; padding: 20px; border-radius: 10px; border: 2px solid #333; margin-bottom: 30px; }
+
+        /* --- 3. Tutorial Scene --- */
+        #scene-tutorial { background-color: #E0F7FA; }
+        .tutorial-card { background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); width: 100%; }
+        .tutorial-step { display: none; }
+        .tutorial-step.active-step { display: block; }
+
+        /* --- 4. Sleep Phase --- */
+        #scene-sleep { background: linear-gradient(to bottom, #0f2027, #203a43, #2c5364); color: #fff; }
+        .sheep-bg { font-size: 8rem; opacity: 0.2; position: absolute; z-index: 0; }
+        .sleep-status { z-index: 1; font-size: 1.5rem; margin-bottom: 30px; }
+        .timer-display { font-size: 3rem; font-weight: bold; height: 60px; margin-bottom: 20px; z-index: 1; opacity: 0; transition: opacity 0.3s; color: #FFD700; text-shadow: 0 0 10px rgba(255, 215, 0, 0.5); }
+        .sleep-ui { z-index: 1; display: flex; flex-direction: column; gap: 20px; width: 80%; }
+        .btn-check { background-color: #555; font-size: 1rem; padding: 10px; }
+        .btn-wake { background-color: #FF5722; font-size: 1.5rem; padding: 20px; box-shadow: 0 6px 0 #bf360c; }
+        .btn-wake:active { box-shadow: none; }
+
+        /* --- 5. Run Phase --- */
+        #scene-run { background-color: #fff; justify-content: space-between; padding-bottom: 40px; }
+        .gaba-effect {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            font-size: 5rem; font-weight: 900; color: #d50000;
+            opacity: 0; pointer-events: none; z-index: 10;
+        }
+        @keyframes gabaAnim { 0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); } 20% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); } 100% { opacity: 0; transform: translate(-50%, -50%) scale(1.5); } }
+
+        .run-header { width: 100%; display: flex; justify-content: space-between; align-items: flex-end; padding-top: 20px; border-bottom: 2px solid #eee; padding-bottom: 10px;}
+        .run-timer { font-size: 3rem; font-weight: bold; color: #d50000; font-family: monospace; }
+        .run-label { font-size: 1rem; color: #666; }
+
+        .progress-container { width: 100%; height: 30px; background: #eee; border-radius: 15px; margin: 10px 0; overflow: hidden; border: 2px solid #333; position: relative; }
+        .progress-bar { height: 100%; background: #00E676; width: 0%; transition: width 0.1s linear; }
+
+        /* --- Obstacle 4-Direction Styles --- */
+        .obstacle-overlay {
+            position: absolute;
+            background: rgba(40, 40, 40, 0.95);
+            color: #fff;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            font-size: 1.5rem; font-weight: bold;
+            z-index: 20;
+            border: 4px solid #FFD700;
+
+            /* 初期状態は不可視 */
+            visibility: hidden;
+            touch-action: none;
+
+            /* アニメーション用設定 */
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .obstacle-overlay.show {
+            visibility: visible;
+        }
+
+        /* 各方向の初期位置設定 
+           showクラスがつくと translate(0,0) になり画面内に現れる
+        */
+
+        /* Top: 上から降ってくる */
+        .obs-top { top: 0; left: 0; width: 100%; height: 50%; transform: translateY(-100%); border-bottom: 8px solid #d50000; }
+        .obs-top.show { transform: translateY(0); }
+
+        /* Bottom: 下から突き上げる */
+        .obs-bottom { bottom: 0; left: 0; width: 100%; height: 50%; transform: translateY(100%); border-top: 8px solid #d50000; }
+        .obs-bottom.show { transform: translateY(0); }
+
+        /* Left: 左から来る */
+        .obs-left { top: 0; left: 0; width: 70%; height: 100%; transform: translateX(-100%); border-right: 8px solid #d50000; }
+        .obs-left.show { transform: translateX(0); }
+
+        /* Right: 右から来る */
+        .obs-right { top: 0; right: 0; width: 70%; height: 100%; transform: translateX(100%); border-left: 8px solid #d50000; }
+        .obs-right.show { transform: translateX(0); }
+
+        .swipe-hint { animation: blink 0.5s infinite; font-size: 3rem; margin-top: 10px; }
+        .safe-hint { font-size: 1rem; color: #FFD700; margin-bottom: 5px; background: #000; padding: 2px 8px; }
+        @keyframes blink { 50% { opacity: 0.5; } }
+
+        .btn-dash {
+            width: 100%; height: 120px; font-size: 2rem; background-color: #2979FF;
+            box-shadow: 0 8px 0 #1565C0; margin-top: auto;
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            z-index: 5;
+        }
+        .btn-dash:active { transform: translateY(8px); box-shadow: none; background-color: #2962FF; }
+
+        /* --- 6. Result Scene --- */
+        #scene-result { background-color: #f0f0f0; }
+        .result-title { font-size: 1.8rem; font-weight: bold; margin-bottom: 20px; color: #333; }
+        .result-score-box { background: #fff; padding: 20px; width: 100%; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .result-row { display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px dashed #ccc; padding-bottom: 5px; }
+        .total-score { font-size: 2.5rem; color: #d50000; font-weight: bold; margin-top: 15px; border-top: 2px solid #333; padding-top: 10px; }
+        .result-img { font-size: 5rem; margin-bottom: 20px; }
+
+        /* --- Utilities --- */
+        .shake { animation: shake 0.5s; }
+        @keyframes shake { 0% { transform: translate(1px, 1px) rotate(0deg); } 10% { transform: translate(-1px, -2px) rotate(-1deg); } 20% { transform: translate(-3px, 0px) rotate(1deg); } 30% { transform: translate(3px, 2px) rotate(0deg); } 40% { transform: translate(1px, -1px) rotate(1deg); } 50% { transform: translate(-1px, 2px) rotate(-1deg); } 60% { transform: translate(-3px, 1px) rotate(0deg); } 70% { transform: translate(3px, 1px) rotate(-1deg); } 80% { transform: translate(-1px, -1px) rotate(1deg); } 90% { transform: translate(1px, 2px) rotate(0deg); } 100% { transform: translate(1px, -2px) rotate(-1deg); } }
+
+    </style>
+</head>
+<body>
+
+<div id="game-container">
+
+    <div id="scene-title" class="scene active">
+        <div class="hero-img">😪</div>
+        <div class="title-logo">もうひとねむり</div>
+        <p>Limit Socialite's Sleep Dash</p>
+        <button onclick="Game.toPrologue()">START</button>
+    </div>
+
+    <div id="scene-prologue" class="scene" onclick="Game.toTutorial()">
+        <div class="hero-img">🏢</div>
+        <div class="story-text">
+            「はあ、つかれた。。。<br>
+            私は限界社会人。今日も終電ギリギリまで残業をしてきた。<br><br>
+            それでも朝はやってくる。<br>
+            本当は今すぐ起きなきゃいけない。<br>
+            そんなことは、分かってる！<br><br>
+            でも朝は1秒でも長く寝たいんです。<br>
+            あと少しだけ、もうひとねむり。」
+        </div>
+        <p class="blink">画面をタップして次へ</p>
+    </div>
+
+    <div id="scene-tutorial" class="scene">
+        <h2>遊び方</h2>
+        <div class="tutorial-card">
+            <div id="tut-step-1" class="tutorial-step active-step">
+                <h3>1. 時間を確認！</h3>
+                <p>開始時に表示される「電車が出るまでの時間」を覚えてください。<br><b>15〜25秒</b>と短めです。</p>
+                <div style="font-size:3rem;">🕰️</div>
+            </div>
+            <div id="tut-step-2" class="tutorial-step">
+                <h3>2. 二度寝のリスク</h3>
+                <p>寝ている間は時計が見えません。<br>「確認」は<b>3回</b>まで。<br>ギリギリまで寝てスコアを稼ごう。</p>
+                <div style="font-size:3rem;">🐑</div>
+            </div>
+            <div id="tut-step-3" class="tutorial-step">
+                <h3>3. 必ず来る障害物！</h3>
+                <p>走っていると<b>3回〜5回</b>障害物が出ます！<br><b>来た方向へスワイプ</b>して押し返してください。<br>（例: 上から来たら、上へスワイプ）</p>
+                <div style="font-size:3rem;">⬅️⬇️⬆️➡️</div>
+            </div>
+        </div>
+        <br>
+        <button id="tut-next-btn" onclick="Game.nextTutorial()">次へ</button>
+    </div>
+
+    <div id="scene-sleep" class="scene">
+        <div class="sheep-bg">🐑</div>
+        <div class="sleep-status">ひとねむり中・・・</div>
+        <div id="sleep-timer" class="timer-display">00:00</div>
+        <div class="sleep-ui">
+            <button id="btn-check-time" class="btn-check" onclick="Game.checkTime()">
+                スマホで時間を見る (残り<span id="check-count">3</span>回)
+            </button>
+            <button class="btn-wake" onclick="Game.wakeUp()">
+                起きる！(出勤)
+            </button>
+        </div>
+    </div>
+
+    <div id="scene-run" class="scene">
+        <div id="gaba-text" class="gaba-effect">ガバッ！</div>
+
+        <div class="run-header">
+            <span class="run-label">電車発車まで</span>
+            <div id="run-timer" class="run-timer">00:00</div>
+        </div>
+
+        <div style="width:100%; margin-top: 20px;">
+            <div class="progress-container">
+                <div id="run-progress" class="progress-bar"></div>
+            </div>
+            <div style="display:flex; justify-content:space-between;">
+                <span>🏠 Home</span>
+                <span>Station 🚉</span>
+            </div>
+        </div>
+
+        <div id="obstacle" class="obstacle-overlay">
+            <span class="safe-hint">⚠️ 邪魔だ！押し返せ！ ⚠️</span>
+            <span id="obs-arrow" class="swipe-hint">⬆️</span>
+            <span id="obs-text" style="margin-top:5px; font-size:1rem;">SWIPE UP</span>
+        </div>
+
+        <button id="btn-dash" class="btn-dash">
+            <span>🏃</span>走る！！(連打)
+        </button>
+    </div>
+
+    <div id="scene-result" class="scene">
+        <div id="result-emoji" class="result-img">😊</div>
+        <h2 id="result-title" class="result-title">タイトル</h2>
+        <div class="result-score-box">
+            <div class="result-row">
+                <span>寝ていた時間</span>
+                <span id="res-sleep-time">0.00s</span>
+            </div>
+            <div class="result-row">
+                <span>残り時間ボーナス</span>
+                <span id="res-remain-time">0.00s</span>
+            </div>
+            <div class="total-score">
+                Score: <span id="res-score">0</span>
+            </div>
+        </div>
+        <button onclick="Game.reset()">タイトルへ戻る</button>
+    </div>
+
+</div>
+
+<script>
+    const Game = {
+        // State
+        totalTimeLimit: 0,
+        startTime: 0,
+        sleepTime: 0,
+        remainingTime: 0,
+        checkCount: 3,
+        runProgress: 0,
+        runInterval: null,
+        sleepInterval: null,
+        tutorialStep: 0,
+
+        obstacleActive: false,
+        obstacleSafeTime: false,
+        obstacleAnimatingOut: false, // アニメーション中フラグ
+        currentObsDir: null,
+        obstacleTriggers: [],
+
+        // Settings
+        minTime: 15,
+        maxTime: 25,
+
+        // DOM Elements
+        ui: {
+            scenes: document.querySelectorAll('.scene'),
+            checkCountSpan: document.getElementById('check-count'),
+            sleepTimer: document.getElementById('sleep-timer'),
+            btnCheck: document.getElementById('btn-check-time'),
+            runTimer: document.getElementById('run-timer'),
+            progressBar: document.getElementById('run-progress'),
+            dashBtn: document.getElementById('btn-dash'),
+            obstacle: document.getElementById('obstacle'),
+            obsArrow: document.getElementById('obs-arrow'),
+            obsText: document.getElementById('obs-text'),
+            gabaText: document.getElementById('gaba-text'),
+            tutSteps: document.querySelectorAll('.tutorial-step'),
+            tutBtn: document.getElementById('tut-next-btn')
+        },
+
+        // --- Transitions ---
+        switchScene: (id) => {
+            Game.ui.scenes.forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+        },
+
+        toPrologue: () => { Game.switchScene('scene-prologue'); },
+
+        toTutorial: () => {
+            Game.tutorialStep = 0;
+            Game.updateTutorialUI();
+            Game.switchScene('scene-tutorial');
+        },
+
+        nextTutorial: () => {
+            Game.tutorialStep++;
+            if (Game.tutorialStep >= Game.ui.tutSteps.length) {
+                Game.startSleepPhase();
+            } else {
+                Game.updateTutorialUI();
+            }
+        },
+
+        updateTutorialUI: () => {
+            Game.ui.tutSteps.forEach((s, i) => {
+                s.classList.toggle('active-step', i === Game.tutorialStep);
+            });
+            Game.ui.tutBtn.textContent = (Game.tutorialStep === Game.ui.tutSteps.length - 1) ? "ゲームスタート" : "次へ";
+        },
+
+        reset: () => {
+            Game.checkCount = 3;
+            Game.runProgress = 0;
+            Game.obstacleActive = false;
+            Game.obstacleSafeTime = false;
+            Game.obstacleAnimatingOut = false;
+            Game.obstacleTriggers = [];
+            Game.ui.checkCountSpan.textContent = Game.checkCount;
+            Game.ui.btnCheck.disabled = false;
+            Game.ui.btnCheck.style.opacity = 1;
+            Game.ui.progressBar.style.width = '0%';
+
+            Game.resetObstacleClasses();
+
+            clearInterval(Game.runInterval);
+            clearInterval(Game.sleepInterval);
+
+            Game.switchScene('scene-title');
+        },
+
+        // --- Sleep Phase ---
+        startSleepPhase: () => {
+            Game.totalTimeLimit = Math.floor(Math.random() * (Game.maxTime - Game.minTime + 1)) + Game.minTime;
+            Game.startTime = Date.now();
+            Game.ui.sleepTimer.textContent = Game.totalTimeLimit.toFixed(2);
+            Game.ui.sleepTimer.style.opacity = 1;
+            setTimeout(() => { Game.ui.sleepTimer.style.opacity = 0; }, 2000);
+
+            Game.switchScene('scene-sleep');
+
+            Game.sleepInterval = setInterval(() => {
+                let current = Date.now();
+                let elapsed = (current - Game.startTime) / 1000;
+                Game.remainingTime = Game.totalTimeLimit - elapsed;
+                if (Game.remainingTime <= 0) {
+                    Game.remainingTime = 0;
+                    Game.wakeUp(true);
+                }
+            }, 100);
+        },
+
+        checkTime: () => {
+            if (Game.checkCount > 0) {
+                Game.checkCount--;
+                Game.ui.checkCountSpan.textContent = Game.checkCount;
+                Game.ui.sleepTimer.textContent = Game.remainingTime.toFixed(2);
+                Game.ui.sleepTimer.style.opacity = 1;
+                setTimeout(() => { Game.ui.sleepTimer.style.opacity = 0; }, 1500);
+                if (Game.checkCount === 0) {
+                    Game.ui.btnCheck.disabled = true;
+                    Game.ui.btnCheck.style.opacity = 0.5;
+                }
+            }
+        },
+
+        wakeUp: (forced = false) => {
+            clearInterval(Game.sleepInterval);
+            Game.sleepTime = (Date.now() - Game.startTime) / 1000;
+            if (forced || Game.remainingTime <= 0) {
+                Game.showResult(false);
+                return;
+            }
+            Game.startRunPhase();
+        },
+
+        // --- Run Phase ---
+        startRunPhase: () => {
+            Game.switchScene('scene-run');
+            Game.ui.gabaText.style.animation = 'none';
+            Game.ui.gabaText.offsetHeight;
+            Game.ui.gabaText.style.animation = 'gabaAnim 1s ease-out';
+
+            const REQUIRED_CLICKS = 45;
+            Game.progressIncrement = 100 / REQUIRED_CLICKS;
+
+            // Generate Obstacle Schedule
+            Game.generateObstacleTriggers();
+
+            Game.runInterval = setInterval(() => {
+                Game.remainingTime -= 0.1;
+                if (Game.remainingTime < 0) Game.remainingTime = 0;
+                Game.ui.runTimer.textContent = Game.remainingTime.toFixed(2);
+
+                if (Game.remainingTime <= 0) {
+                    clearInterval(Game.runInterval);
+                    Game.showResult(false);
+                }
+            }, 100);
+
+            Game.runProgress = 0;
+            Game.ui.progressBar.style.width = '0%';
+        },
+
+        generateObstacleTriggers: () => {
+            const count = Math.floor(Math.random() * 3) + 3; // 3, 4, or 5
+            Game.obstacleTriggers = [];
+            const rangeStart = 10;
+            const rangeEnd = 90;
+            const step = (rangeEnd - rangeStart) / count;
+
+            for (let i = 0; i < count; i++) {
+                const segmentStart = rangeStart + (step * i);
+                const randomOffset = Math.random() * (step * 0.8);
+                Game.obstacleTriggers.push(segmentStart + randomOffset);
+            }
+            Game.obstacleTriggers.sort((a, b) => a - b);
+        },
+
+        spawnObstacle: () => {
+            Game.obstacleActive = true;
+            Game.obstacleSafeTime = true;
+            Game.obstacleAnimatingOut = false; // Reset anim flag
+
+            const dirs = ['top', 'bottom', 'left', 'right'];
+            Game.currentObsDir = dirs[Math.floor(Math.random() * dirs.length)];
+
+            // Clean slate
+            Game.resetObstacleClasses();
+
+            const el = Game.ui.obstacle;
+            el.classList.add(`obs-${Game.currentObsDir}`);
+
+            // Force Reflow (重要: ブラウザに初期位置を認識させる)
+            void el.offsetWidth;
+
+            // Update Text
+            switch(Game.currentObsDir) {
+                case 'top':
+                    Game.ui.obsArrow.textContent = '⬆️';
+                    Game.ui.obsText.textContent = 'SWIPE UP!';
+                    break;
+                case 'bottom':
+                    Game.ui.obsArrow.textContent = '⬇️';
+                    Game.ui.obsText.textContent = 'SWIPE DOWN!';
+                    break;
+                case 'left':
+                    Game.ui.obsArrow.textContent = '⬅️';
+                    Game.ui.obsText.textContent = 'SWIPE LEFT!';
+                    break;
+                case 'right':
+                    Game.ui.obsArrow.textContent = '➡️';
+                    Game.ui.obsText.textContent = 'SWIPE RIGHT!';
+                    break;
+            }
+
+            // Animate In
+            el.classList.add('show');
+
+            // Shake
+            document.getElementById('game-container').classList.add('shake');
+            setTimeout(() => document.getElementById('game-container').classList.remove('shake'), 500);
+
+            // Safe time end
+            setTimeout(() => { Game.obstacleSafeTime = false; }, 500);
+        },
+
+        resetObstacleClasses: () => {
+            Game.ui.obstacle.className = 'obstacle-overlay';
+            // no specific obs-* class, no show class
+        },
+
+        removeObstacle: () => {
+            if (Game.obstacleActive && !Game.obstacleAnimatingOut) {
+                Game.obstacleAnimatingOut = true; // Prevent double trigger
+                Game.obstacleSafeTime = false;
+
+                // Remove 'show' class => Triggers CSS Transition back to off-screen
+                Game.ui.obstacle.classList.remove('show');
+
+                // Wait for animation to finish (300ms matches CSS transition)
+                setTimeout(() => {
+                    Game.obstacleActive = false;
+                    Game.obstacleAnimatingOut = false;
+                    Game.resetObstacleClasses();
+                }, 300);
+            }
+        },
+
+        tapRun: () => {
+            // アニメーション中もタップ無効
+            if (Game.obstacleActive || Game.obstacleAnimatingOut) {
+                if (Game.obstacleSafeTime) return;
+                // アニメーション退出中はゲームオーバーにしないが、タップは無視
+                if (Game.obstacleAnimatingOut) return;
+
+                clearInterval(Game.runInterval);
+                Game.showResult(false, true); // Crash
+                return;
+            }
+
+            Game.runProgress += Game.progressIncrement;
+
+            if (Game.obstacleTriggers.length > 0 && Game.runProgress >= Game.obstacleTriggers[0]) {
+                Game.spawnObstacle();
+                Game.obstacleTriggers.shift();
+            }
+
+            if (Game.runProgress > 100) Game.runProgress = 100;
+            Game.ui.progressBar.style.width = Game.runProgress + '%';
+
+            if (Game.runProgress >= 100) {
+                clearInterval(Game.runInterval);
+                Game.showResult(true);
+            }
+        },
+
+        // --- Result ---
+        showResult: (isClear, isCrash = false) => {
+            Game.switchScene('scene-result');
+            const rTitle = document.getElementById('result-title');
+            const rEmoji = document.getElementById('result-emoji');
+            const rScore = document.getElementById('res-score');
+            const rSleep = document.getElementById('res-sleep-time');
+            const rRemain = document.getElementById('res-remain-time');
+
+            if (isClear) {
+                rEmoji.textContent = '😎';
+                rTitle.textContent = '切り替え完璧社会人 クリア！';
+                rTitle.style.color = '#2E7D32';
+                const score = Math.floor((Game.sleepTime * 100) + (Game.remainingTime * 500));
+                rSleep.textContent = Game.sleepTime.toFixed(2) + 's';
+                rRemain.textContent = Game.remainingTime.toFixed(2) + 's';
+                rScore.textContent = score.toLocaleString();
+            } else {
+                rEmoji.textContent = '😭';
+                if (isCrash) {
+                    rTitle.textContent = '障害物に激突しました...';
+                } else {
+                    rTitle.textContent = 'ちこく確定... (クビ)';
+                }
+                rTitle.style.color = '#d50000';
+                rSleep.textContent = Game.sleepTime.toFixed(2) + 's';
+                rRemain.textContent = 'Time Up';
+                rScore.textContent = '0';
+            }
+        }
+    };
+
+    // --- Inputs ---
+    const btnDash = document.getElementById('btn-dash');
+    btnDash.addEventListener('mousedown', (e) => { e.preventDefault(); Game.tapRun(); });
+    btnDash.addEventListener('touchstart', (e) => { e.preventDefault(); Game.tapRun(); }, {passive: false});
+
+    // --- Swipe Logic ---
+    const obstacleEl = document.getElementById('obstacle');
+    let startX = 0, startY = 0;
+
+    obstacleEl.addEventListener('touchstart', (e) => {
+        startX = e.changedTouches[0].pageX;
+        startY = e.changedTouches[0].pageY;
+    }, {passive: false});
+
+    obstacleEl.addEventListener('touchmove', (e) => { e.preventDefault(); }, {passive: false});
+
+    obstacleEl.addEventListener('touchend', (e) => {
+        let endX = e.changedTouches[0].pageX;
+        let endY = e.changedTouches[0].pageY;
+        handleSwipe(endX - startX, endY - startY);
+    }, {passive: false});
+
+    obstacleEl.addEventListener('mousedown', (e) => {
+        startX = e.pageX;
+        startY = e.pageY;
+    });
+    obstacleEl.addEventListener('mouseup', (e) => {
+        handleSwipe(e.pageX - startX, e.pageY - startY);
+    });
+
+    function handleSwipe(diffX, diffY) {
+        if (!Game.obstacleActive || Game.obstacleAnimatingOut) return;
+
+        if (Math.abs(diffX) < 30 && Math.abs(diffY) < 30) return;
+
+        let swipeDir = '';
+        if (Math.abs(diffX) > Math.abs(diffY)) {
+            swipeDir = (diffX > 0) ? 'right' : 'left';
+        } else {
+            swipeDir = (diffY > 0) ? 'down' : 'up';
+        }
+
+        let expectedSwipe = '';
+        if (Game.currentObsDir === 'top') expectedSwipe = 'up';
+        else if (Game.currentObsDir === 'bottom') expectedSwipe = 'down';
+        else expectedSwipe = Game.currentObsDir;
+
+        if (swipeDir === expectedSwipe) {
+            Game.removeObstacle();
+        }
+    }
+
+</script>
+</body>
+</html>
