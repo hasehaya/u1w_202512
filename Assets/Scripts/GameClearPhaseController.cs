@@ -2,10 +2,10 @@
 using UnityEngine.UI;
 
 /// <summary>
-/// リザルト画面フェーズコントローラー
-/// 責務: ゲーム結果を表示するフェーズの管理
+/// ゲームクリア画面フェーズコントローラー
+/// 責務: ゲームクリア結果を表示するフェーズの管理
 /// </summary>
-public class ResultPhaseController : PhaseController
+public class GameClearPhaseController : PhaseController
 {
     [Header("UI References")]
     [SerializeField] private Text scoreText;
@@ -16,20 +16,9 @@ public class ResultPhaseController : PhaseController
     [SerializeField] private Button titleButton;
 
     private float sleepDuration;
-    private float remainingTime;
     private int score;
 
-    public override GameState PhaseType => GameState.Result;
-
-    /// <summary>
-    /// リザルトデータを設定（GameManagerから呼び出される）
-    /// </summary>
-    public void SetResultData(float sleepDuration, float remainingTime, int score)
-    {
-        this.sleepDuration = sleepDuration;
-        this.remainingTime = remainingTime;
-        this.score = score;
-    }
+    public override GameState PhaseType => GameState.GameClear;
 
     protected override void OnEnterImpl()
     {
@@ -37,7 +26,6 @@ public class ResultPhaseController : PhaseController
         RequestTransitionTo(GameState.Title);
         
         // GameManagerから直接データを取得
-        remainingTime = GameManager.Instance.Data.RemainingTime;
         score = GameManager.Instance.Data.Score();
         
         SetupButtons();
@@ -46,7 +34,7 @@ public class ResultPhaseController : PhaseController
 
     public override void UpdatePhase()
     {
-        // リザルト画面の更新処理（必要に応じて実装）
+        // ゲームクリア画面の更新処理（必要に応じて実装）
     }
 
     protected override void OnExitImpl()
@@ -72,22 +60,20 @@ public class ResultPhaseController : PhaseController
 
     private void DisplayResult()
     {
-        bool isCleared = score > 0;
-
         if (scoreText != null)
             scoreText.text = $"Score: {score}";
 
         if (resultText != null)
         {
-            resultText.text = isCleared ? "Success!" : "Failed!";
-            resultText.color = isCleared ? Color.green : Color.red;
+            resultText.text = "Game Clear!";
+            resultText.color = Color.green;
         }
 
         if (sleepTimeText != null)
             sleepTimeText.text = $"{sleepDuration:F2}s";
 
         if (remainingTimeText != null)
-            remainingTimeText.text = isCleared ? $"{remainingTime:F2}s" : "Time Up";
+            remainingTimeText.text = $"{GameManager.Instance.Data.RemainingTime:F2}s";
     }
 
     private void OnRetry()
@@ -101,12 +87,8 @@ public class ResultPhaseController : PhaseController
     }
 
     /// <summary>
-    /// ゲームをクリアしたかどうか
-    /// </summary>
-    public bool IsCleared => score > 0;
-
-    /// <summary>
     /// スコア
     /// </summary>
     public int Score => score;
 }
+

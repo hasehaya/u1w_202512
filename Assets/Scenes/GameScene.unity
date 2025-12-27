@@ -486,6 +486,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Run
       objectReference: {fileID: 0}
+    - target: {fileID: 6328220173131608120, guid: 3b0a458aeabf0334db48885202e38203, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8821599440454683285, guid: 3b0a458aeabf0334db48885202e38203, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -568,11 +572,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 9045238669909574368, guid: 3b0a458aeabf0334db48885202e38203, type: 3}
       propertyPath: m_AnchorMax.x
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 9045238669909574368, guid: 3b0a458aeabf0334db48885202e38203, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -697,17 +701,6 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 4942864712374972419, guid: a1f67d97f56f2c94c8259e0ff8e32fdc, type: 3}
   m_PrefabInstance: {fileID: 958477699912709344}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &958477699912709346 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 3468554838140688971, guid: a1f67d97f56f2c94c8259e0ff8e32fdc, type: 3}
-  m_PrefabInstance: {fileID: 958477699912709344}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8e25280a900d4e598f1e4cb9f62bb8d6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ResultPhaseController
 --- !u!4 &1092410561514465532
 Transform:
   m_ObjectHideFlags: 0
@@ -1227,9 +1220,8 @@ MonoBehaviour:
   tutorialController: {fileID: 7849994769372343943}
   sleepController: {fileID: 4073648583993368802}
   runController: {fileID: 670058479112220646}
-  resultController: {fileID: 958477699912709346}
-  minTime: 15
-  maxTime: 25
+  gameClearController: {fileID: 0}
+  gameOverController: {fileID: 0}
 --- !u!1 &7730128550068338345
 GameObject:
   m_ObjectHideFlags: 0

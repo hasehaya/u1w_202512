@@ -25,22 +25,16 @@ public class RunPhaseController : PhaseController
     [SerializeField] private float safeTimeDuration;
     [SerializeField] private int minObstacles;
     [SerializeField] private int maxObstacles;
+    [SerializeField] private float collisionPenaltyDuration;
 
-    private float currentRemainingTime;
     private float progress;
     private float progressIncrement;
     private List<float> obstacleTriggers = new List<float>();
     private bool isInSafeTime;
+    private bool isInputLocked;
+    private float inputLockTimer;
 
     public override GameState PhaseType => GameState.Run;
-
-    /// <summary>
-    /// 残り時間を設定（GameManagerから呼び出される）
-    /// </summary>
-    public void SetRemainingTime(float remainingTime)
-    {
-        currentRemainingTime = remainingTime;
-    }
 
     private void Start()
     {
@@ -82,6 +76,8 @@ public class RunPhaseController : PhaseController
     {
         progress = 0;
         isInSafeTime = false;
+        isInputLocked = false;
+        inputLockTimer = 0f;
         progressIncrement = 1f / requiredClicks;
 
         if (progressBar != null)
@@ -90,26 +86,29 @@ public class RunPhaseController : PhaseController
         if (player != null)
             player.ResetPosition();
 
+        if (tapButton != null)
+            tapButton.interactable = true;
+
         GenerateObstacleTriggers();
     }
 
     public override void UpdatePhase()
     {
-        currentRemainingTime -= Time.deltaTime;
+        GameManager.Instance.Data.RemainingTime -= Time.deltaTime;
         
         UpdateTimerUI();
         CheckCollision();
+        UpdateInputLock();
 
-        if (currentRemainingTime <= 0)
+        if (GameManager.Instance.Data.RemainingTime <= 0)
         {
-            GameManager.Instance.HandleGameOver();
+            GameManager.Instance.RequestPhaseTransition(GameState.GameOver);
         }
     }
 
     protected override void OnExitImpl()
     {
         progress = 0;
-        currentRemainingTime = 0;
         obstacleTriggers.Clear();
         CancelInvoke();
     }
@@ -117,7 +116,13 @@ public class RunPhaseController : PhaseController
 
     private void HandleTap()
     {
-        if (!IsActive) return;
+        if (!IsActive || isInputLocked) return;
+
+        // プレイヤーの画像を切り替え
+        if (player != null)
+        {
+            player.SwitchSprite();
+        }
 
         AddProgress();
         CheckObstacleTrigger();
@@ -135,7 +140,7 @@ public class RunPhaseController : PhaseController
     private void CheckCollision()
     {
         if (player == null || obstacleManager == null) return;
-        if (!obstacleManager.IsActive || isInSafeTime) return;
+        if (!obstacleManager.IsActive || isInSafeTime || isInputLocked) return;
 
         // プレイヤーと障害物の位置を比較
         PlayerPosition playerPos = player.CurrentPosition;
@@ -154,7 +159,7 @@ public class RunPhaseController : PhaseController
 
         if (isCollision)
         {
-            GameManager.Instance.HandleGameOver();
+            HandleCollision();
         }
     }
 
@@ -179,7 +184,7 @@ public class RunPhaseController : PhaseController
     {
         if (progress >= 1f)
         {
-            GameManager.Instance.HandleGameClear(currentRemainingTime);
+            GameManager.Instance.RequestPhaseTransition(GameState.GameClear);
         }
     }
 
@@ -211,14 +216,24 @@ public class RunPhaseController : PhaseController
         // セーフタイムを開始
         isInSafeTime = true;
         
-        // アニメーション完了後のセーフタイム経過後に削除とセーフタイム終了
-        // 注: 障害物のアニメーション時間(moveDuration)はObstacleで管理されているため、
-        // ここではセーフタイムのみを考慮して削除タイミングを決定
-        Invoke(nameof(DespawnObstacle), safeTimeDuration);
+        // 一定時間後にセーフタイムを終了
+        Invoke(nameof(EndSafeTime), safeTimeDuration);
+        
+        // 障害物の削除は別途管理（セーフタイムとは独立）
+        // 必要に応じて障害物のアニメーション時間を考慮した削除を追加可能
+        Invoke(nameof(DespawnObstacle), safeTimeDuration + 1f);
     }
 
     /// <summary>
-    /// 障害物を削除してセーフタイムを終了
+    /// セーフタイムを終了
+    /// </summary>
+    private void EndSafeTime()
+    {
+        isInSafeTime = false;
+    }
+
+    /// <summary>
+    /// 障害物を削除
     /// </summary>
     private void DespawnObstacle()
     {
@@ -226,24 +241,59 @@ public class RunPhaseController : PhaseController
         {
             obstacleManager.Hide();
         }
-        
-        // セーフタイムを終了
-        isInSafeTime = false;
     }
 
     private void UpdateTimerUI()
     {
         if (timerText != null)
-            timerText.text = Mathf.Max(0, currentRemainingTime).ToString("F2");
+            timerText.text = Mathf.Max(0, GameManager.Instance.Data.RemainingTime).ToString("F2");
     }
 
     /// <summary>
-    /// 現在の進捗 (0~1)
+    /// 衝突時の処理：ボタンを無効化し、プレイヤーを赤く明滅
     /// </summary>
-    public float Progress => progress;
+    private void HandleCollision()
+    {
+        // 入力をロック
+        isInputLocked = true;
+        inputLockTimer = collisionPenaltyDuration;
+        
+        // ボタンを無効化
+        if (tapButton != null)
+        {
+            tapButton.interactable = false;
+        }
+
+        // プレイヤーの明滅エフェクト
+        if (player != null)
+        {
+            player.PlayDamageEffect();
+        }
+
+        // セーフタイムを設定（連続で当たり判定が発生しないようにする）
+        isInSafeTime = true;
+    }
 
     /// <summary>
-    /// 現在の残り時間
+    /// 入力ロックタイマーを更新し、時間経過でロック解除
     /// </summary>
-    public float RemainingTime => currentRemainingTime;
+    private void UpdateInputLock()
+    {
+        if (isInputLocked)
+        {
+            inputLockTimer -= Time.deltaTime;
+
+            if (inputLockTimer <= 0)
+            {
+                isInputLocked = false;
+                inputLockTimer = 0f;
+
+                // ボタンを再有効化
+                if (tapButton != null)
+                {
+                    tapButton.interactable = true;
+                }
+            }
+        }
+    }
 }

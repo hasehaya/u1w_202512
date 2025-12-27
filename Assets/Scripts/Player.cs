@@ -26,12 +26,21 @@ public class Player : MonoBehaviour
     [Header("Auto Return Settings")]
     [SerializeField] private float autoReturnDelay = 1.0f;
 
+    [Header("Damage Effect Settings")]
+    [SerializeField] private Color damageColor = Color.red;
+    [SerializeField] private float blinkDuration = 0.2f;
+    [SerializeField] private int blinkCount = 5;
+
     private PlayerPosition currentPosition = PlayerPosition.Center;
     private Tween moveTween;
+    private Tween blinkTween;
     private float spriteChangeTimer = 0f;
     private bool useFirstSprite = true;
     private float autoReturnTimer = 0f;
     private bool shouldAutoReturn = false;
+    private Color originalColor;
+    private float idleTimer = 0f;
+    private float idleThreshold = 0.5f; // 入力がない時間がこれを超えたら自動切り替え開始
 
     public PlayerPosition CurrentPosition => currentPosition;
 
@@ -47,6 +56,7 @@ public class Player : MonoBehaviour
         if (playerImage != null && sprite1 != null)
         {
             playerImage.sprite = sprite1;
+            originalColor = playerImage.color;
         }
 
         SubscribeToInputEvents();
@@ -54,8 +64,11 @@ public class Player : MonoBehaviour
 
     private void Update()
     {
-        // スプライトの切り替え処理
-        if (playerImage != null && sprite1 != null && sprite2 != null)
+        // アイドルタイマーを更新
+        idleTimer += Time.deltaTime;
+
+        // アイドル状態（入力がない状態が続いている）の場合のみ、スプライトを自動切り替え
+        if (idleTimer >= idleThreshold && playerImage != null && sprite1 != null && sprite2 != null)
         {
             spriteChangeTimer += Time.deltaTime;
 
@@ -85,6 +98,7 @@ public class Player : MonoBehaviour
     {
         UnsubscribeFromInputEvents();
         moveTween?.Kill();
+        blinkTween?.Kill();
     }
 
     private void SubscribeToInputEvents()
@@ -181,6 +195,46 @@ public class Player : MonoBehaviour
         {
             rectTransform.anchoredPosition = new Vector2(0f, centerPositionY);
         }
+    }
+
+    /// <summary>
+    /// 手動でスプライトを切り替える（ボタン押下時などに使用）
+    /// </summary>
+    public void SwitchSprite()
+    {
+        if (playerImage == null || sprite1 == null || sprite2 == null) return;
+
+        // スプライトを切り替え
+        useFirstSprite = !useFirstSprite;
+        playerImage.sprite = useFirstSprite ? sprite1 : sprite2;
+
+        // アイドルタイマーとスプライト切り替えタイマーをリセット
+        idleTimer = 0f;
+        spriteChangeTimer = 0f;
+    }
+
+    /// <summary>
+    /// ダメージを受けた際の赤く明滅するエフェクト
+    /// </summary>
+    public void PlayDamageEffect()
+    {
+        if (playerImage == null) return;
+
+        // 既存の明滅を停止
+        blinkTween?.Kill();
+
+        // 明滅シーケンスを作成
+        Sequence blinkSequence = DOTween.Sequence();
+
+        for (int i = 0; i < blinkCount; i++)
+        {
+            // 赤に変化
+            blinkSequence.Append(playerImage.DOColor(damageColor, blinkDuration));
+            // 元の色に戻る
+            blinkSequence.Append(playerImage.DOColor(originalColor, blinkDuration));
+        }
+
+        blinkTween = blinkSequence;
     }
 }
 

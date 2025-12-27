@@ -6,7 +6,8 @@
     Tutorial,
     Sleep,
     Run,
-    Result
+    GameClear,
+    GameOver
 }
 
 public enum SwipeDirection
