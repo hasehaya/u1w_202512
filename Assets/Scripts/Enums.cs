@@ -20,8 +20,6 @@ public enum SwipeDirection
 
 public enum ObstaclePosition
 {
-    Top,
-    Bottom,
     Left,
     Right
 }

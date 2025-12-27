@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+﻿﻿using UnityEngine;
 
 /// <summary>
 /// ゲームデータを管理するクラス
@@ -34,6 +34,14 @@ public class GameData
         SleepDuration = Time.time - SleepStartTime;
         float elapsed = Time.time - SleepStartTime;
         RemainingTime = Mathf.Max(0, TotalTimeLimit - elapsed);
+    }
+
+    /// <summary>
+    /// 残り時間を設定
+    /// </summary>
+    public void SetRemainingTime(float time)
+    {
+        RemainingTime = Mathf.Max(0, time);
     }
 
     /// <summary>

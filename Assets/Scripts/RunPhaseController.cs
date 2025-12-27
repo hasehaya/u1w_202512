@@ -13,8 +13,11 @@ public class RunPhaseController : PhaseController
     [SerializeField] private Slider progressBar;
     [SerializeField] private GameObject gabaText;
 
+    [Header("Player")]
+    [SerializeField] private Player player;
+
     [Header("Obstacle")]
-    [SerializeField] private ObstacleController obstacleController;
+    [SerializeField] private ObstacleManager obstacleManager;
 
     [Header("Settings")]
     [SerializeField] private float requiredClicks = 45f;
@@ -37,8 +40,6 @@ public class RunPhaseController : PhaseController
     {
         currentRemainingTime = remainingTime;
     }
-
-    #region Unity Lifecycle
 
     private void Start()
     {
@@ -68,10 +69,6 @@ public class RunPhaseController : PhaseController
         }
     }
 
-    #endregion
-
-    #region Phase Lifecycle
-
     protected override void OnEnterImpl()
     {
         progress = 0;
@@ -80,6 +77,9 @@ public class RunPhaseController : PhaseController
 
         if (progressBar != null)
             progressBar.value = 0;
+
+        if (player != null)
+            player.ResetPosition();
 
         GenerateObstacleTriggers();
         ShowGabaEffect();
@@ -90,6 +90,7 @@ public class RunPhaseController : PhaseController
         currentRemainingTime -= Time.deltaTime;
         
         UpdateTimerUI();
+        CheckCollision();
 
         if (currentRemainingTime <= 0)
         {
@@ -115,22 +116,9 @@ public class RunPhaseController : PhaseController
         Time.timeScale = 1f;
     }
 
-    #endregion
-
-    #region Input Handling
-
     private void HandleTap()
     {
         if (!IsActive) return;
-
-        if (obstacleController != null && obstacleController.IsActive)
-        {
-            if (isInSafeTime) return;
-            
-            // 障害物に激突
-            RequestGameOver();
-            return;
-        }
 
         AddProgress();
         CheckObstacleTrigger();
@@ -139,31 +127,39 @@ public class RunPhaseController : PhaseController
 
     private void HandleSwipe(SwipeDirection swipeDir)
     {
-        if (!IsActive || obstacleController == null || !obstacleController.IsActive) return;
+        if (!IsActive) return;
+        
+        // プレイヤーの移動はPlayerControllerが自動で処理
+        // ここでは何もしない（衝突判定はUpdatePhaseで行う）
+    }
 
-        bool isCorrect = CheckSwipeDirection(swipeDir);
+    private void CheckCollision()
+    {
+        if (player == null || obstacleManager == null) return;
+        if (!obstacleManager.IsActive || isInSafeTime) return;
 
-        if (isCorrect)
+        // プレイヤーと障害物の位置を比較
+        PlayerPosition playerPos = player.CurrentPosition;
+        ObstaclePosition obstaclePos = obstacleManager.CurrentPosition;
+
+        bool isCollision = false;
+
+        // 左側の障害物に左側にいる場合は衝突
+        if (obstaclePos == ObstaclePosition.Left && playerPos == PlayerPosition.Left)
         {
-            obstacleController.Hide(true);
+            isCollision = true;
+        }
+        // 右側の障害物に右側にいる場合は衝突
+        else if (obstaclePos == ObstaclePosition.Right && playerPos == PlayerPosition.Right)
+        {
+            isCollision = true;
+        }
+
+        if (isCollision)
+        {
+            RequestGameOver();
         }
     }
-
-    private bool CheckSwipeDirection(SwipeDirection swipeDir)
-    {
-        return obstacleController.CurrentPosition switch
-        {
-            ObstaclePosition.Top => swipeDir == SwipeDirection.Up,
-            ObstaclePosition.Bottom => swipeDir == SwipeDirection.Down,
-            ObstaclePosition.Left => swipeDir == SwipeDirection.Left,
-            ObstaclePosition.Right => swipeDir == SwipeDirection.Right,
-            _ => false
-        };
-    }
-
-    #endregion
-
-    #region Game Logic
 
     private void AddProgress()
     {
@@ -207,10 +203,13 @@ public class RunPhaseController : PhaseController
 
     private void SpawnObstacle()
     {
-        if (obstacleController == null) return;
+        if (obstacleManager == null) return;
 
-        ObstaclePosition pos = (ObstaclePosition)Random.Range(0, 4);
-        obstacleController.Spawn(pos);
+        // 0: Left Start, 1: Left End, 2: Right Start, 3: Right End
+        int posIndex = Random.Range(0, 4);
+        ObstaclePosition pos = (posIndex < 2) ? ObstaclePosition.Left : ObstaclePosition.Right;
+        
+        obstacleManager.Spawn(pos, posIndex);
 
         isInSafeTime = true;
         Invoke(nameof(EndSafeTime), safeTimeDuration);
@@ -220,10 +219,6 @@ public class RunPhaseController : PhaseController
     {
         isInSafeTime = false;
     }
-
-    #endregion
-
-    #region UI
 
     private void UpdateTimerUI()
     {
@@ -246,10 +241,6 @@ public class RunPhaseController : PhaseController
             gabaText.SetActive(false);
     }
 
-    #endregion
-
-    #region Properties
-
     /// <summary>
     /// 現在の進捗 (0~1)
     /// </summary>
@@ -259,6 +250,4 @@ public class RunPhaseController : PhaseController
     /// 現在の残り時間
     /// </summary>
     public float RemainingTime => currentRemainingTime;
-
-    #endregion
 }
