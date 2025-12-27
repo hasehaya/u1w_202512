@@ -211,12 +211,26 @@ public class RunPhaseController : PhaseController
         
         obstacleManager.Spawn(pos, posIndex);
 
+        // セーフタイムを開始
         isInSafeTime = true;
-        Invoke(nameof(EndSafeTime), safeTimeDuration);
+        
+        // アニメーション完了後のセーフタイム経過後に削除とセーフタイム終了
+        // 注: 障害物のアニメーション時間(moveDuration)はObstacleで管理されているため、
+        // ここではセーフタイムのみを考慮して削除タイミングを決定
+        Invoke(nameof(DespawnObstacle), safeTimeDuration);
     }
 
-    private void EndSafeTime()
+    /// <summary>
+    /// 障害物を削除してセーフタイムを終了
+    /// </summary>
+    private void DespawnObstacle()
     {
+        if (obstacleManager != null)
+        {
+            obstacleManager.DespawnCurrentObstacle();
+        }
+        
+        // セーフタイムを終了
         isInSafeTime = false;
     }
 

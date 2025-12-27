@@ -18,23 +18,15 @@ public class Obstacle : MonoBehaviour
 
     [Header("Animation Settings")]
     [SerializeField] private float moveDuration = 2f; // 始点から終点への移動時間
-    [SerializeField] private float waitDurationAfterReachEnd = 1f; // 終点到達後の待機時間
 
     private ObstaclePosition currentPos;
     private Vector2 startPos; // 始点
     private Vector2 endPos; // 終点
     private Tween currentTween;
     private int positionIndex; // 0: Left Start, 1: Left End, 2: Right Start, 3: Right End
-    private bool hasReachedEnd; // 終点に到達したか
 
     public ObstaclePosition CurrentPosition => currentPos;
     public bool IsActive { get; private set; }
-    public bool HasReachedEnd => hasReachedEnd;
-    
-    /// <summary>
-    /// 終点到達後、待機時間が経過したときに呼ばれるイベント
-    /// </summary>
-    public event Action OnReadyToDespawn;
 
     // posIndex: 0=Left Start, 1=Left End, 2=Right Start, 3=Right End
     public void Spawn(ObstaclePosition pos, int posIndex)
@@ -45,7 +37,6 @@ public class Obstacle : MonoBehaviour
         currentPos = pos;
         positionIndex = posIndex;
         IsActive = true;
-        hasReachedEnd = false;
         gameObject.SetActive(true);
 
         SetupPosition(pos, posIndex);
@@ -101,18 +92,7 @@ public class Obstacle : MonoBehaviour
     {
         // 始点から終点へ直接移動
         currentTween = rectTransform.DOAnchorPos(endPos, moveDuration)
-            .SetEase(Ease.Linear)
-            .OnComplete(() =>
-            {
-                // 終点に到達
-                hasReachedEnd = true;
-                
-                // 待機時間後にイベントを発火（外部から削除処理を行う）
-                DOVirtual.DelayedCall(waitDurationAfterReachEnd, () =>
-                {
-                    OnReadyToDespawn?.Invoke();
-                });
-            });
+            .SetEase(Ease.Linear);
     }
 
     private void OnDestroy()

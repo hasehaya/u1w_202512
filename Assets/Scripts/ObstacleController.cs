@@ -99,24 +99,18 @@ public class ObstacleManager : MonoBehaviour
             yield break;
         }
 
-        // イベント購読: 終点到達後の待機時間経過時に削除
-        currentObstacle.OnReadyToDespawn += HandleObstacleReadyToDespawn;
-
         // Obstacleをスライドインさせる（初期位置が始点）
         currentObstacle.Spawn(pos, posIndex);
     }
 
     /// <summary>
-    /// Obstacleが終点到達後、待機時間を経過したときに呼ばれるハンドラ
+    /// 現在の障害物を削除（RunPhaseControllerから呼び出される）
     /// </summary>
-    private void HandleObstacleReadyToDespawn()
+    public void DespawnCurrentObstacle()
     {
         if (currentObstacle != null)
         {
-            // イベント購読解除
-            currentObstacle.OnReadyToDespawn -= HandleObstacleReadyToDespawn;
-            
-            // 削除処理
+            currentObstacle.Despawn();
             Destroy(currentObstacle.gameObject);
             currentObstacle = null;
         }
@@ -144,9 +138,6 @@ public class ObstacleManager : MonoBehaviour
 
         if (currentObstacle != null)
         {
-            // イベント購読解除
-            currentObstacle.OnReadyToDespawn -= HandleObstacleReadyToDespawn;
-            
             currentObstacle.Despawn();
             Destroy(currentObstacle.gameObject);
             currentObstacle = null;
@@ -176,9 +167,6 @@ public class ObstacleManager : MonoBehaviour
         // クリーンアップ
         if (currentObstacle != null)
         {
-            // イベント購読解除
-            currentObstacle.OnReadyToDespawn -= HandleObstacleReadyToDespawn;
-            
             Destroy(currentObstacle.gameObject);
             currentObstacle = null;
         }
