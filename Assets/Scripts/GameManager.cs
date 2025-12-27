@@ -18,15 +18,6 @@ public class GameManager : MonoBehaviour
     [SerializeField] private RunPhaseController runController;
     [SerializeField] private ResultPhaseController resultController;
 
-    [Header("UI Panels")]
-    [SerializeField] private GameObject titlePanel;
-    [SerializeField] private GameObject loadingPanel;
-    [SerializeField] private GameObject prologuePanel;
-    [SerializeField] private GameObject tutorialPanel;
-    [SerializeField] private GameObject sleepPanel;
-    [SerializeField] private GameObject runPanel;
-    [SerializeField] private GameObject resultPanel;
-
     [Header("Game Settings")]
     [SerializeField] private float minTime = 15f;
     [SerializeField] private float maxTime = 25f;
@@ -41,41 +32,8 @@ public class GameManager : MonoBehaviour
     private Dictionary<GameState, PhaseController> phaseControllers;
     private Dictionary<GameState, GameObject> panelMap;
 
-    #region Unity Lifecycle
 
     private void Awake()
-    {
-        InitializeSingleton();
-        InitializeGameData();
-        InitializePhaseControllers();
-        InitializePanelMap();
-    }
-
-    private void OnEnable()
-    {
-        SubscribeToEvents();
-    }
-
-    private void OnDisable()
-    {
-        UnsubscribeFromEvents();
-    }
-
-    private void Start()
-    {
-        ChangeState(GameState.Title);
-    }
-
-    private void Update()
-    {
-        UpdateCurrentPhase();
-    }
-
-    #endregion
-
-    #region Initialization
-
-    private void InitializeSingleton()
     {
         if (Instance == null)
         {
@@ -85,6 +43,18 @@ public class GameManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
+        InitializeGameData();
+        InitializePhaseControllers();
+    }
+    
+    private void Start()
+    {
+        ChangeState(GameState.Title);
+    }
+
+    private void Update()
+    {
+        UpdateCurrentPhase();
     }
 
     private void InitializeGameData()
@@ -109,38 +79,6 @@ public class GameManager : MonoBehaviour
             { GameState.Result, resultController }
         };
     }
-
-    private void InitializePanelMap()
-    {
-        panelMap = new Dictionary<GameState, GameObject>
-        {
-            { GameState.Title, titlePanel },
-            { GameState.Loading, loadingPanel },
-            { GameState.Prologue, prologuePanel },
-            { GameState.Tutorial, tutorialPanel },
-            { GameState.Sleep, sleepPanel },
-            { GameState.Run, runPanel },
-            { GameState.Result, resultPanel }
-        };
-    }
-
-    private void SubscribeToEvents()
-    {
-        PhaseEvents.OnPhaseTransitionRequested += ChangeState;
-        PhaseEvents.OnGameClearRequested += HandleGameClear;
-        PhaseEvents.OnGameOverRequested += HandleGameOver;
-    }
-
-    private void UnsubscribeFromEvents()
-    {
-        PhaseEvents.OnPhaseTransitionRequested -= ChangeState;
-        PhaseEvents.OnGameClearRequested -= HandleGameClear;
-        PhaseEvents.OnGameOverRequested -= HandleGameOver;
-    }
-
-    #endregion
-
-    #region Phase Management
 
     private void UpdateCurrentPhase()
     {
@@ -235,41 +173,29 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    #endregion
-
-    #region Game Events
-
-    private void HandleGameClear(float finalRemainingTime)
+    /// <summary>
+    /// ゲームクリア処理
+    /// </summary>
+    public void HandleGameClear(float finalRemainingTime)
     {
         gameData.SetGameClear(finalRemainingTime);
         ChangeState(GameState.Result);
     }
 
-    private void HandleGameOver()
+    /// <summary>
+    /// ゲームオーバー処理
+    /// </summary>
+    public void HandleGameOver()
     {
         gameData.SetGameOver();
         ChangeState(GameState.Result);
     }
 
-    #endregion
-
-    #region Pause Control
-
     /// <summary>
-    /// ゲームを一時停止
+    /// フェーズ遷移をリクエスト
     /// </summary>
-    public void PauseGame()
+    public void RequestPhaseTransition(GameState newState)
     {
-        currentPhaseController?.Pause();
+        ChangeState(newState);
     }
-
-    /// <summary>
-    /// ゲームを再開
-    /// </summary>
-    public void ResumeGame()
-    {
-        currentPhaseController?.Resume();
-    }
-
-    #endregion
 }

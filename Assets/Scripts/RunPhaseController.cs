@@ -94,7 +94,7 @@ public class RunPhaseController : PhaseController
 
         if (currentRemainingTime <= 0)
         {
-            RequestGameOver();
+            GameManager.Instance.HandleGameOver();
         }
     }
 
@@ -106,15 +106,6 @@ public class RunPhaseController : PhaseController
         CancelInvoke();
     }
 
-    protected override void OnPauseImpl()
-    {
-        Time.timeScale = 0f;
-    }
-
-    protected override void OnResumeImpl()
-    {
-        Time.timeScale = 1f;
-    }
 
     private void HandleTap()
     {
@@ -157,7 +148,7 @@ public class RunPhaseController : PhaseController
 
         if (isCollision)
         {
-            RequestGameOver();
+            GameManager.Instance.HandleGameOver();
         }
     }
 
@@ -182,7 +173,7 @@ public class RunPhaseController : PhaseController
     {
         if (progress >= 1f)
         {
-            RequestGameClear(currentRemainingTime);
+            GameManager.Instance.HandleGameClear(currentRemainingTime);
         }
     }
 

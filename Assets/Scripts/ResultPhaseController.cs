@@ -33,6 +33,11 @@ public class ResultPhaseController : PhaseController
 
     protected override void OnEnterImpl()
     {
+        // GameManagerから直接データを取得
+        sleepDuration = GameManager.Instance.Data.SleepDuration;
+        remainingTime = GameManager.Instance.Data.RemainingTime;
+        score = GameManager.Instance.Data.Score;
+        
         SetupButtons();
         DisplayResult();
     }
@@ -93,8 +98,6 @@ public class ResultPhaseController : PhaseController
         RequestTransitionTo(GameState.Title);
     }
 
-    #region Properties
-
     /// <summary>
     /// ゲームをクリアしたかどうか
     /// </summary>
@@ -104,6 +107,4 @@ public class ResultPhaseController : PhaseController
     /// スコア
     /// </summary>
     public int Score => score;
-
-    #endregion
 }
