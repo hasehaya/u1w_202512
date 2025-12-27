@@ -13,7 +13,10 @@ public class SleepPhaseController : PhaseController
     [SerializeField] private Text checkCountText;
     [SerializeField] private Button checkButton;
     [SerializeField] private Button wakeUpButton;
-    [SerializeField] private GameObject sheepImage;
+    [SerializeField] private Button backSleepButton;
+
+    [SerializeField] private GameObject dream;
+    [SerializeField] private GameObject checkWatch;
 
     [Header("Settings")]
     [SerializeField] private int maxCheckCount = 3;
@@ -22,8 +25,19 @@ public class SleepPhaseController : PhaseController
     private int checkCount;
     private float totalTime;
     private float phaseStartTime;
+    
+    private CheckWatchAnimationController checkWatchController;
 
     public override GameState PhaseType => GameState.Sleep;
+    
+    private SleepGameState sleepGameState = SleepGameState.Dream;
+
+
+    private enum SleepGameState
+    {
+        Dream,
+        CheckWatch
+    }
 
     /// <summary>
     /// 時間制限を設定（GameManagerから呼び出される）
@@ -35,57 +49,68 @@ public class SleepPhaseController : PhaseController
 
     protected override void OnEnterImpl()
     {
-        // デバッグ用
-        RequestTransitionTo(GameState.Run);
-        
-        checkCount = maxCheckCount;
-        phaseStartTime = Time.time;
-        
+        checkWatchController = checkWatch.GetComponent<CheckWatchAnimationController>();
+        checkButton.onClick.AddListener(() => ChangeState(SleepGameState.CheckWatch));
+        wakeUpButton.onClick.AddListener(() => RequestTransitionTo(GameState.Run));
+        backSleepButton.onClick.AddListener(() =>
         {
-        if (checkButton != null)
-            checkButton.onClick.AddListener(OnCheckTime);
-        }
+            ChangeState(SleepGameState.Dream);
+        });
+
+        checkWatchController.OnEnterAnimationComplete += () =>
+        {
+            wakeUpButton.enabled = true;
+            backSleepButton.enabled = true;
+        };
+        checkWatchController.OnExitAnimationComplete += () =>
+        {
+            checkWatch.SetActive(false);
+            dream.SetActive(true);
+            checkButton.enabled = true;
+        };
         
-        if (wakeUpButton != null)
-            wakeUpButton.onClick.AddListener(OnWakeUp);
-            checkButton.interactable = true;
-        
-        UpdateUI();
-        StartCoroutine(ShowTimerBriefly());
+        Initialize();
+        sleepGameState = SleepGameState.Dream;
+        dream.SetActive(true);
+        checkButton.enabled = true;
     }
 
     public override void UpdatePhase()
     {
-        float elapsed = Time.time - phaseStartTime;
-        float remaining = totalTime - elapsed;
-
-        if (remaining <= 0)
-        {
-            // 寝過ごした場合は即リザルトへ
-            GameManager.Instance.Data.EndSleep();
-            if (GameManager.Instance.Data.IsOverslept)
-            {
-                GameManager.Instance.Data.SetGameOver();
-                if (checkButton != null)
-                    checkButton.onClick.RemoveListener(OnCheckTime);
-                if (wakeUpButton != null)
-                    wakeUpButton.onClick.RemoveListener(OnWakeUp);
-                RequestTransitionTo(GameState.Result);
-                return;
-            }
-        
-            // 時間内に起きた場合はRunフェーズへ
-            if (checkButton != null)
-                checkButton.onClick.RemoveListener(OnCheckTime);
-            if (wakeUpButton != null)
-                wakeUpButton.onClick.RemoveListener(OnWakeUp);
-            RequestTransitionTo(GameState.Run);
-        }
     }
 
     protected override void OnExitImpl()
     {
         StopAllCoroutines();
+    }
+
+
+    private void Initialize()
+    {
+        checkButton.enabled = false;
+        wakeUpButton.enabled = false;
+        backSleepButton.enabled = false;
+        
+        dream.SetActive(false);
+        checkWatch.SetActive(false);
+    }
+    
+    private void ChangeState(SleepGameState newState)
+    {
+        sleepGameState = newState;
+        switch (sleepGameState)
+        {
+            case SleepGameState.Dream:
+                backSleepButton.enabled = false;
+                wakeUpButton.enabled = false;
+                checkWatchController.PlayExitAnimation();
+                break;
+            case SleepGameState.CheckWatch:
+                dream.SetActive(false);
+                checkWatch.SetActive(true);
+                checkButton.enabled = false;
+                break;
+        }
     }
 
     /// <summary>
