@@ -1,0 +1,459 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &740998481781329155
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5720872231909674167}
+  - component: {fileID: 5343647450297772376}
+  - component: {fileID: 2599506243493529574}
+  m_Layer: 5
+  m_Name: SheepLow0
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &5720872231909674167
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 740998481781329155}
+  m_LocalRotation: {x: 0, y: 0, z: -0.043619405, w: 0.9990483}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 0.8, y: 0.8, z: 0.8}
+  m_ConstrainProportionsScale: 1
+  m_Children: []
+  m_Father: {fileID: 5817238651146476384}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: -5}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 652, y: 264}
+  m_SizeDelta: {x: 559, y: 481}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!222 &5343647450297772376
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 740998481781329155}
+  m_CullTransparentMesh: 1
+--- !u!114 &2599506243493529574
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 740998481781329155}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: -364168269436235747, guid: 5281d1d374078584f9535db8628b7cb0, type: 3}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!1 &786626405440550423
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6318002200658466821}
+  - component: {fileID: 2563429777920684774}
+  - component: {fileID: 34632069061008340}
+  m_Layer: 5
+  m_Name: SheepLow2
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &6318002200658466821
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 786626405440550423}
+  m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 0.8, y: 0.8, z: 0.8}
+  m_ConstrainProportionsScale: 1
+  m_Children: []
+  m_Father: {fileID: 5817238651146476384}
+  m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: -622, y: 264}
+  m_SizeDelta: {x: 559, y: 481}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!222 &2563429777920684774
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 786626405440550423}
+  m_CullTransparentMesh: 1
+--- !u!114 &34632069061008340
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 786626405440550423}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: -364168269436235747, guid: 5281d1d374078584f9535db8628b7cb0, type: 3}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!1 &6011750922435024320
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 9158565348769239579}
+  - component: {fileID: 4208090838933869835}
+  - component: {fileID: 2632074223079999566}
+  m_Layer: 5
+  m_Name: SheepLow1
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &9158565348769239579
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6011750922435024320}
+  m_LocalRotation: {x: 0, y: 0, z: -0.18223555, w: 0.9832549}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 0.8, y: 0.8, z: 0.8}
+  m_ConstrainProportionsScale: 1
+  m_Children: []
+  m_Father: {fileID: 5817238651146476384}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: -21}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 385, y: -160}
+  m_SizeDelta: {x: 559, y: 481}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!222 &4208090838933869835
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6011750922435024320}
+  m_CullTransparentMesh: 1
+--- !u!114 &2632074223079999566
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6011750922435024320}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: -364168269436235747, guid: 5281d1d374078584f9535db8628b7cb0, type: 3}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!1 &6093390731358618400
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6676459447744595269}
+  - component: {fileID: 6363220078427912728}
+  - component: {fileID: 8246249591225747318}
+  m_Layer: 5
+  m_Name: SheepLow3
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &6676459447744595269
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6093390731358618400}
+  m_LocalRotation: {x: -0.08715578, y: 0.9961947, z: -0, w: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 0.8, y: 0.8, z: 0.8}
+  m_ConstrainProportionsScale: 1
+  m_Children: []
+  m_Father: {fileID: 5817238651146476384}
+  m_LocalEulerAnglesHint: {x: 0, y: 180, z: -10}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: -737, y: -299.5}
+  m_SizeDelta: {x: 559, y: 481}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!222 &6363220078427912728
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6093390731358618400}
+  m_CullTransparentMesh: 1
+--- !u!114 &8246249591225747318
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6093390731358618400}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: -364168269436235747, guid: 5281d1d374078584f9535db8628b7cb0, type: 3}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!1 &7187612413585091628
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5817238651146476384}
+  - component: {fileID: 8095595431388039948}
+  m_Layer: 5
+  m_Name: SheepLows
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &5817238651146476384
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7187612413585091628}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 5720872231909674167}
+  - {fileID: 9158565348769239579}
+  - {fileID: 6318002200658466821}
+  - {fileID: 6676459447744595269}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &8095595431388039948
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7187612413585091628}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c96c135fdffe6a74bb1b7db1ebfff75f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SheepLowsAnimationController
+  floatingObjects:
+  - targetTransform: {fileID: 5720872231909674167}
+    enableRotation: 1
+    rotationSpeed: 1
+    rotationAmplitude: 5
+    rotationPhaseOffset: 6.73
+    enablePositionX: 0
+    positionXSpeed: 1
+    positionXAmplitude: 50
+    positionXPhaseOffset: 0
+    enablePositionY: 0
+    positionYSpeed: 1.5
+    positionYAmplitude: 30
+    positionYPhaseOffset: 0
+    enableScaleX: 0
+    scaleXSpeed: 1
+    scaleXAmplitude: 0.1
+    scaleXPhaseOffset: 0
+    enableScaleY: 0
+    scaleYSpeed: 1
+    scaleYAmplitude: 0.1
+    scaleYPhaseOffset: 0
+    initialPosition: {x: 652, y: 264, z: 0}
+    initialScale: {x: 0.8, y: 0.8, z: 0.8}
+    initialRotation: {x: -0, y: -0, z: -0, w: 1}
+    isInitialized: 1
+  - targetTransform: {fileID: 9158565348769239579}
+    enableRotation: 1
+    rotationSpeed: 1
+    rotationAmplitude: 5
+    rotationPhaseOffset: 3.96
+    enablePositionX: 0
+    positionXSpeed: 1
+    positionXAmplitude: 50
+    positionXPhaseOffset: 0
+    enablePositionY: 0
+    positionYSpeed: 1.5
+    positionYAmplitude: 30
+    positionYPhaseOffset: 0
+    enableScaleX: 0
+    scaleXSpeed: 1
+    scaleXAmplitude: 0.1
+    scaleXPhaseOffset: 0
+    enableScaleY: 0
+    scaleYSpeed: 1
+    scaleYAmplitude: 0.1
+    scaleYPhaseOffset: 0
+    initialPosition: {x: 201, y: -89, z: 0}
+    initialScale: {x: 0.8, y: 0.8, z: 0.8}
+    initialRotation: {x: -0, y: -0, z: -0, w: 1}
+    isInitialized: 1
+  - targetTransform: {fileID: 6318002200658466821}
+    enableRotation: 1
+    rotationSpeed: 1
+    rotationAmplitude: 5
+    rotationPhaseOffset: 6.42
+    enablePositionX: 0
+    positionXSpeed: 1
+    positionXAmplitude: 50
+    positionXPhaseOffset: 0
+    enablePositionY: 0
+    positionYSpeed: 1.5
+    positionYAmplitude: 30
+    positionYPhaseOffset: 0
+    enableScaleX: 0
+    scaleXSpeed: 1
+    scaleXAmplitude: 0.1
+    scaleXPhaseOffset: 0
+    enableScaleY: 0
+    scaleYSpeed: 1
+    scaleYAmplitude: 0.1
+    scaleYPhaseOffset: 0
+    initialPosition: {x: -615, y: 282, z: 0}
+    initialScale: {x: 0.8, y: 0.8, z: 0.8}
+    initialRotation: {x: 0, y: 1, z: 0, w: 0}
+    isInitialized: 1
+  - targetTransform: {fileID: 6676459447744595269}
+    enableRotation: 1
+    rotationSpeed: 1
+    rotationAmplitude: 5
+    rotationPhaseOffset: 1.19
+    enablePositionX: 0
+    positionXSpeed: 1
+    positionXAmplitude: 50
+    positionXPhaseOffset: 0
+    enablePositionY: 0
+    positionYSpeed: 1.5
+    positionYAmplitude: 30
+    positionYPhaseOffset: 0
+    enableScaleX: 0
+    scaleXSpeed: 1
+    scaleXAmplitude: 0.1
+    scaleXPhaseOffset: 0
+    enableScaleY: 0
+    scaleYSpeed: 1
+    scaleYAmplitude: 0.1
+    scaleYPhaseOffset: 0
+    initialPosition: {x: -737, y: -299.5, z: 0}
+    initialScale: {x: 0.8, y: 0.8, z: 0.8}
+    initialRotation: {x: 0, y: 1, z: 0, w: 0}
+    isInitialized: 1
+  enableScroll: 1
+  scrollSpeed: 20
+  resetPositionX: 1920
+  removePositionX: -1920
