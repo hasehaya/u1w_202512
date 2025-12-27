@@ -4,6 +4,7 @@ using System;
 /// <summary>
 /// フェーズ基本クラス
 /// 全てのゲームフェーズはこのクラスを継承します
+/// 責務: 個々のフェーズのロジック管理
 /// </summary>
 public abstract class PhaseController : MonoBehaviour
 {
@@ -12,13 +13,19 @@ public abstract class PhaseController : MonoBehaviour
     // フェーズの状態管理
     protected bool isActive = false;
     protected bool isPaused = false;
-    protected GameState phaseType;
 
-    // イベント
-    public event Action<GameState> OnPhaseStarted;
-    public event Action<GameState> OnPhaseEnded;
+    /// <summary>
+    /// このフェーズのタイプ（サブクラスでオーバーライド）
+    /// </summary>
+    public virtual GameState PhaseType => GameState.Title;
+
+    // イベント（必要に応じて外部で購読可能）
+    public event Action OnPhaseStarted;
+    public event Action OnPhaseEnded;
     public event Action OnPhasePaused;
     public event Action OnPhaseResumed;
+
+    #region Unity Lifecycle
 
     protected virtual void Awake()
     {
@@ -26,32 +33,32 @@ public abstract class PhaseController : MonoBehaviour
             canvasGroup = GetComponent<CanvasGroup>();
     }
 
+    #endregion
+
+    #region Phase Lifecycle
+
     /// <summary>
-    /// フェーズの初期化
-    /// Initialize()を呼び出す前に必ずこのメソッドを実行します
+    /// フェーズ開始時に呼ばれる
     /// </summary>
     public virtual void OnPhaseEnter()
     {
         isActive = true;
         isPaused = false;
-        OnPhaseStarted?.Invoke(phaseType);
-        Initialize();
+        SetVisible(true);
+        OnPhaseStarted?.Invoke();
+        OnEnterImpl();
     }
 
     /// <summary>
-    /// フェーズの終了処理
+    /// フェーズ終了時に呼ばれる
     /// </summary>
     public virtual void OnPhaseExit()
     {
         isActive = false;
-        Cleanup();
-        OnPhaseEnded?.Invoke(phaseType);
+        OnExitImpl();
+        SetVisible(false);
+        OnPhaseEnded?.Invoke();
     }
-
-    /// <summary>
-    /// フェーズの初期化（サブクラスでオーバーライド）
-    /// </summary>
-    public abstract void Initialize();
 
     /// <summary>
     /// フェーズの更新（毎フレーム呼び出される）
@@ -59,9 +66,18 @@ public abstract class PhaseController : MonoBehaviour
     public abstract void UpdatePhase();
 
     /// <summary>
-    /// フェーズの終了処理（サブクラスでオーバーライド）
+    /// サブクラス用：OnPhaseEnter()時の処理
     /// </summary>
-    public abstract void Cleanup();
+    protected virtual void OnEnterImpl() { }
+
+    /// <summary>
+    /// サブクラス用：OnPhaseExit()時の処理
+    /// </summary>
+    protected virtual void OnExitImpl() { }
+
+    #endregion
+
+    #region Pause Control
 
     /// <summary>
     /// フェーズの一時停止
@@ -90,29 +106,38 @@ public abstract class PhaseController : MonoBehaviour
     }
 
     /// <summary>
-    /// サブクラス用：Pause()時の処理をオーバーライド
+    /// サブクラス用：Pause()時の処理
     /// </summary>
     protected virtual void OnPauseImpl() { }
 
     /// <summary>
-    /// サブクラス用：Resume()時の処理をオーバーライド
+    /// サブクラス用：Resume()時の処理
     /// </summary>
     protected virtual void OnResumeImpl() { }
+
+    #endregion
+
+    #region Visibility
 
     /// <summary>
     /// フェーズの表示/非表示切り替え
     /// </summary>
-    public virtual void SetVisible(bool visible)
+    protected virtual void SetVisible(bool visible)
     {
         if (canvasGroup != null)
         {
             canvasGroup.alpha = visible ? 1f : 0f;
             canvasGroup.blocksRaycasts = visible;
+            canvasGroup.interactable = visible;
         }
     }
 
+    #endregion
+
+    #region Properties
+
     /// <summary>
-    /// フェーズがアクティブかどうか
+    /// フェーズがアクティブかつ非停止中かどうか
     /// </summary>
     public bool IsActive => isActive && !isPaused;
 
@@ -122,8 +147,38 @@ public abstract class PhaseController : MonoBehaviour
     public bool IsPaused => isPaused;
 
     /// <summary>
-    /// このフェーズのタイプを取得
+    /// フェーズがアクティブかどうか（停止中含む）
     /// </summary>
-    public GameState PhaseType => phaseType;
-}
+    public bool IsPhaseActive => isActive;
 
+    #endregion
+
+    #region Phase Transition Helper
+
+    /// <summary>
+    /// 次のフェーズへ遷移をリクエスト
+    /// GameManagerへイベント経由で通知
+    /// </summary>
+    protected void RequestTransitionTo(GameState nextState)
+    {
+        PhaseEvents.RequestPhaseTransition(nextState);
+    }
+
+    /// <summary>
+    /// ゲームクリアをリクエスト
+    /// </summary>
+    protected void RequestGameClear(float remainingTime)
+    {
+        PhaseEvents.RequestGameClear(remainingTime);
+    }
+
+    /// <summary>
+    /// ゲームオーバーをリクエスト
+    /// </summary>
+    protected void RequestGameOver()
+    {
+        PhaseEvents.RequestGameOver();
+    }
+
+    #endregion
+}

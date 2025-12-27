@@ -3,79 +3,107 @@ using UnityEngine.UI;
 
 /// <summary>
 /// リザルト画面フェーズコントローラー
-/// ゲーム結果を表示するフェーズ
+/// 責務: ゲーム結果を表示するフェーズの管理
 /// </summary>
 public class ResultPhaseController : PhaseController
 {
+    [Header("UI References")]
     [SerializeField] private Text scoreText;
     [SerializeField] private Text resultText;
+    [SerializeField] private Text sleepTimeText;
+    [SerializeField] private Text remainingTimeText;
     [SerializeField] private Button retryButton;
     [SerializeField] private Button titleButton;
 
-    private void Start()
+    private float sleepDuration;
+    private float remainingTime;
+    private int score;
+
+    public override GameState PhaseType => GameState.Result;
+
+    /// <summary>
+    /// リザルトデータを設定（GameManagerから呼び出される）
+    /// </summary>
+    public void SetResultData(float sleepDuration, float remainingTime, int score)
     {
-        phaseType = GameState.Result;
+        this.sleepDuration = sleepDuration;
+        this.remainingTime = remainingTime;
+        this.score = score;
     }
 
-    public override void Initialize()
+    protected override void OnEnterImpl()
     {
-        SetVisible(true);
+        SetupButtons();
+        DisplayResult();
+    }
 
+    public override void UpdatePhase()
+    {
+        // リザルト画面の更新処理（必要に応じて実装）
+    }
+
+    protected override void OnExitImpl()
+    {
+        CleanupButtons();
+    }
+
+    private void SetupButtons()
+    {
         if (retryButton != null)
             retryButton.onClick.AddListener(OnRetry);
         if (titleButton != null)
             titleButton.onClick.AddListener(OnBackToTitle);
     }
 
-    public override void UpdatePhase()
-    {
-        // リザルト画面の更新処理
-    }
-
-    public override void Cleanup()
+    private void CleanupButtons()
     {
         if (retryButton != null)
             retryButton.onClick.RemoveListener(OnRetry);
         if (titleButton != null)
             titleButton.onClick.RemoveListener(OnBackToTitle);
-
-        SetVisible(false);
     }
 
-    /// <summary>
-    /// リザルトを表示
-    /// </summary>
-    public void DisplayResult(float sleepDuration, float remainingTime, int score)
+    private void DisplayResult()
     {
+        bool isCleared = score > 0;
+
         if (scoreText != null)
             scoreText.text = $"Score: {score}";
 
         if (resultText != null)
         {
-            string result = remainingTime > 0 ? "Success!" : "Failed!";
-            resultText.text = result;
+            resultText.text = isCleared ? "Success!" : "Failed!";
+            resultText.color = isCleared ? Color.green : Color.red;
         }
+
+        if (sleepTimeText != null)
+            sleepTimeText.text = $"{sleepDuration:F2}s";
+
+        if (remainingTimeText != null)
+            remainingTimeText.text = isCleared ? $"{remainingTime:F2}s" : "Time Up";
     }
 
-    /// <summary>
-    /// リトライボタン
-    /// </summary>
     private void OnRetry()
     {
-        GameManager.Instance.ChangeState(GameState.Sleep);
+        RequestTransitionTo(GameState.Sleep);
     }
 
-    /// <summary>
-    /// タイトルに戻る
-    /// </summary>
     private void OnBackToTitle()
     {
-        GameManager.Instance.ChangeState(GameState.Title);
+        RequestTransitionTo(GameState.Title);
     }
+
+    #region Properties
 
     /// <summary>
     /// ゲームをクリアしたかどうか
     /// </summary>
-    public bool IsClear { get; set; }
-}
+    public bool IsCleared => score > 0;
 
+    /// <summary>
+    /// スコア
+    /// </summary>
+    public int Score => score;
+
+    #endregion
+}

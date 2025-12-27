@@ -4,33 +4,54 @@ using System.Collections.Generic;
 
 /// <summary>
 /// ラン（移動）フェーズコントローラー
-/// プレイヤーが障害物を避けながら進むフェーズ
+/// 責務: プレイヤーが障害物を避けながら進むフェーズの管理
 /// </summary>
 public class RunPhaseController : PhaseController
 {
     [Header("UI")]
     [SerializeField] private Text timerText;
     [SerializeField] private Slider progressBar;
-    [SerializeField] private GameObject gabaText; // 「ガバッ」
+    [SerializeField] private GameObject gabaText;
 
     [Header("Obstacle")]
     [SerializeField] private ObstacleController obstacleController;
 
+    [Header("Settings")]
+    [SerializeField] private float requiredClicks = 45f;
+    [SerializeField] private float safeTimeDuration = 0.5f;
+    [SerializeField] private int minObstacles = 3;
+    [SerializeField] private int maxObstacles = 6;
+
     private float currentRemainingTime;
-    private float progress = 0;
-    
-    // 障害物関連
-    private List<float> obstacleTriggers = new List<float>();
-    private bool isInSafeTime = false;
-    private const float SAFE_TIME_DURATION = 0.5f;
-    private const float REQUIRED_CLICKS = 45f;
+    private float progress;
     private float progressIncrement;
+    private List<float> obstacleTriggers = new List<float>();
+    private bool isInSafeTime;
+
+    public override GameState PhaseType => GameState.Run;
+
+    /// <summary>
+    /// 残り時間を設定（GameManagerから呼び出される）
+    /// </summary>
+    public void SetRemainingTime(float remainingTime)
+    {
+        currentRemainingTime = remainingTime;
+    }
+
+    #region Unity Lifecycle
 
     private void Start()
     {
-        phaseType = GameState.Run;
-        
-        // イベント購読
+        SubscribeToInputEvents();
+    }
+
+    private void OnDestroy()
+    {
+        UnsubscribeFromInputEvents();
+    }
+
+    private void SubscribeToInputEvents()
+    {
         if (InputManager.Instance != null)
         {
             InputManager.Instance.OnTap += HandleTap;
@@ -38,7 +59,7 @@ public class RunPhaseController : PhaseController
         }
     }
 
-    private void OnDestroy()
+    private void UnsubscribeFromInputEvents()
     {
         if (InputManager.Instance != null)
         {
@@ -47,56 +68,40 @@ public class RunPhaseController : PhaseController
         }
     }
 
-    public override void Initialize()
-    {
-        // パラメータなし初期化版
-    }
+    #endregion
 
-    /// <summary>
-    /// 残り時間を指定して初期化
-    /// </summary>
-    public void Initialize(float remainingTime)
+    #region Phase Lifecycle
+
+    protected override void OnEnterImpl()
     {
-        currentRemainingTime = remainingTime;
         progress = 0;
-        
+        isInSafeTime = false;
+        progressIncrement = 1f / requiredClicks;
+
         if (progressBar != null)
             progressBar.value = 0;
-        
-        progressIncrement = 1f / REQUIRED_CLICKS;
+
         GenerateObstacleTriggers();
-        
-        SetVisible(true);
-        
-        // 演出
-        if (gabaText != null)
-        {
-            gabaText.SetActive(true);
-            Invoke(nameof(HideGaba), 1f);
-        }
+        ShowGabaEffect();
     }
 
     public override void UpdatePhase()
     {
-        if (!IsActive) return;
-
         currentRemainingTime -= Time.deltaTime;
         
-        if (timerText != null)
-            timerText.text = Mathf.Max(0, currentRemainingTime).ToString("F2");
+        UpdateTimerUI();
 
         if (currentRemainingTime <= 0)
         {
-            GameManager.Instance.GameOver();
+            RequestGameOver();
         }
     }
 
-    public override void Cleanup()
+    protected override void OnExitImpl()
     {
         progress = 0;
         currentRemainingTime = 0;
         obstacleTriggers.Clear();
-        SetVisible(false);
         CancelInvoke();
     }
 
@@ -110,10 +115,85 @@ public class RunPhaseController : PhaseController
         Time.timeScale = 1f;
     }
 
+    #endregion
+
+    #region Input Handling
+
+    private void HandleTap()
+    {
+        if (!IsActive) return;
+
+        if (obstacleController != null && obstacleController.IsActive)
+        {
+            if (isInSafeTime) return;
+            
+            // 障害物に激突
+            RequestGameOver();
+            return;
+        }
+
+        AddProgress();
+        CheckObstacleTrigger();
+        CheckClear();
+    }
+
+    private void HandleSwipe(SwipeDirection swipeDir)
+    {
+        if (!IsActive || obstacleController == null || !obstacleController.IsActive) return;
+
+        bool isCorrect = CheckSwipeDirection(swipeDir);
+
+        if (isCorrect)
+        {
+            obstacleController.Hide(true);
+        }
+    }
+
+    private bool CheckSwipeDirection(SwipeDirection swipeDir)
+    {
+        return obstacleController.CurrentPosition switch
+        {
+            ObstaclePosition.Top => swipeDir == SwipeDirection.Up,
+            ObstaclePosition.Bottom => swipeDir == SwipeDirection.Down,
+            ObstaclePosition.Left => swipeDir == SwipeDirection.Left,
+            ObstaclePosition.Right => swipeDir == SwipeDirection.Right,
+            _ => false
+        };
+    }
+
+    #endregion
+
+    #region Game Logic
+
+    private void AddProgress()
+    {
+        progress += progressIncrement;
+        
+        if (progressBar != null)
+            progressBar.value = progress;
+    }
+
+    private void CheckObstacleTrigger()
+    {
+        if (obstacleTriggers.Count > 0 && progress >= obstacleTriggers[0])
+        {
+            SpawnObstacle();
+            obstacleTriggers.RemoveAt(0);
+        }
+    }
+
+    private void CheckClear()
+    {
+        if (progress >= 1f)
+        {
+            RequestGameClear(currentRemainingTime);
+        }
+    }
+
     private void GenerateObstacleTriggers()
     {
         obstacleTriggers.Clear();
-        int count = Random.Range(3, 6); // 3 to 5
+        int count = Random.Range(minObstacles, maxObstacles);
         float start = 0.1f;
         float end = 0.9f;
         float step = (end - start) / count;
@@ -125,88 +205,60 @@ public class RunPhaseController : PhaseController
         }
     }
 
-    private void HideGaba()
-    {
-        if (gabaText != null)
-            gabaText.SetActive(false);
-    }
-
-    /// <summary>
-    /// InputManagerから呼ばれるタップ処理
-    /// </summary>
-    private void HandleTap()
-    {
-        if (!IsActive) return;
-
-        // 障害物が出ている時
-        if (obstacleController.IsActive)
-        {
-            if (isInSafeTime) return; // 猶予期間は無視
-            
-            // 障害物に激突（ゲームオーバー）
-            GameManager.Instance.GameOver();
-            return;
-        }
-
-        // 進行
-        progress += progressIncrement;
-        
-        if (progressBar != null)
-            progressBar.value = progress;
-
-        // 障害物出現チェック
-        if (obstacleTriggers.Count > 0 && progress >= obstacleTriggers[0])
-        {
-            SpawnObstacle();
-            obstacleTriggers.RemoveAt(0);
-        }
-
-        // クリアチェック
-        if (progress >= 1f)
-        {
-            GameManager.Instance.GameClear(currentRemainingTime);
-        }
-    }
-
-    /// <summary>
-    /// InputManagerから呼ばれるスワイプ処理
-    /// </summary>
-    private void HandleSwipe(SwipeDirection swipeDir)
-    {
-        if (!IsActive || !obstacleController.IsActive) return;
-
-        // 「押し返す」ロジック: 上から来たら(Top)、上にスワイプ(Up)で正解
-        bool isCorrect = false;
-        switch (obstacleController.CurrentPosition)
-        {
-            case ObstaclePosition.Top: isCorrect = (swipeDir == SwipeDirection.Up); break;
-            case ObstaclePosition.Bottom: isCorrect = (swipeDir == SwipeDirection.Down); break;
-            case ObstaclePosition.Left: isCorrect = (swipeDir == SwipeDirection.Left); break;
-            case ObstaclePosition.Right: isCorrect = (swipeDir == SwipeDirection.Right); break;
-        }
-
-        if (isCorrect)
-        {
-            obstacleController.Hide(true);
-        }
-    }
-
     private void SpawnObstacle()
     {
-        // ランダムな位置から出現
+        if (obstacleController == null) return;
+
         ObstaclePosition pos = (ObstaclePosition)Random.Range(0, 4);
         obstacleController.Spawn(pos);
 
-        // 猶予時間の開始
         isInSafeTime = true;
-        Invoke(nameof(EndSafeTime), SAFE_TIME_DURATION);
-        
-        // 画面を揺らすなどの演出を入れるならここ
+        Invoke(nameof(EndSafeTime), safeTimeDuration);
     }
 
     private void EndSafeTime()
     {
         isInSafeTime = false;
     }
-}
 
+    #endregion
+
+    #region UI
+
+    private void UpdateTimerUI()
+    {
+        if (timerText != null)
+            timerText.text = Mathf.Max(0, currentRemainingTime).ToString("F2");
+    }
+
+    private void ShowGabaEffect()
+    {
+        if (gabaText != null)
+        {
+            gabaText.SetActive(true);
+            Invoke(nameof(HideGabaEffect), 1f);
+        }
+    }
+
+    private void HideGabaEffect()
+    {
+        if (gabaText != null)
+            gabaText.SetActive(false);
+    }
+
+    #endregion
+
+    #region Properties
+
+    /// <summary>
+    /// 現在の進捗 (0~1)
+    /// </summary>
+    public float Progress => progress;
+
+    /// <summary>
+    /// 現在の残り時間
+    /// </summary>
+    public float RemainingTime => currentRemainingTime;
+
+    #endregion
+}

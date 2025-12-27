@@ -1,36 +1,39 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 
 /// <summary>
 /// タイトル画面フェーズコントローラー
+/// 責務: タイトル画面のロジック管理
 /// </summary>
 public class TitlePhaseController : PhaseController
 {
-    private void Start()
-    {
-        phaseType = GameState.Title;
-    }
+    [SerializeField] private Button startButton;
 
-    public override void Initialize()
+    public override GameState PhaseType => GameState.Title;
+
+    protected override void OnEnterImpl()
     {
-        SetVisible(true);
+        if (startButton != null)
+            startButton.onClick.AddListener(OnClickStart);
     }
 
     public override void UpdatePhase()
     {
-        // タイトル画面での入力処理はUIManager側で行う
+        // タイトル画面での更新処理
     }
 
-    public override void Cleanup()
+    protected override void OnExitImpl()
     {
-        SetVisible(false);
+        if (startButton != null)
+            startButton.onClick.RemoveListener(OnClickStart);
     }
 
     /// <summary>
-    /// ゲーム開始時の遷移
+    /// スタートボタンクリック時
     /// </summary>
-    public void StartGame()
+    private void OnClickStart()
     {
-        GameManager.Instance.ChangeState(GameState.Loading);
+        RequestTransitionTo(GameState.Prologue);
     }
 }
 

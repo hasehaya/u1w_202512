@@ -4,80 +4,73 @@ using System.Collections;
 
 /// <summary>
 /// 睡眠フェーズコントローラー
-/// プレイヤーが目を覚ます時間を決めるフェーズ
+/// 責務: プレイヤーが目を覚ます時間を決めるフェーズの管理
 /// </summary>
 public class SleepPhaseController : PhaseController
 {
+    [Header("UI References")]
     [SerializeField] private Text timerText;
     [SerializeField] private Text checkCountText;
     [SerializeField] private Button checkButton;
-    [SerializeField] private GameObject sheepImage; // 演出用
+    [SerializeField] private Button wakeUpButton;
+    [SerializeField] private GameObject sheepImage;
 
-    private int checkCount = 3;
+    [Header("Settings")]
+    [SerializeField] private int maxCheckCount = 3;
+    [SerializeField] private float timerDisplayDuration = 1.5f;
+
+    private int checkCount;
     private float totalTime;
     private float phaseStartTime;
 
-    private void Start()
+    public override GameState PhaseType => GameState.Sleep;
+
+    /// <summary>
+    /// 時間制限を設定（GameManagerから呼び出される）
+    /// </summary>
+    public void SetTimeLimit(float limit)
     {
-        phaseType = GameState.Sleep;
+        totalTime = limit;
     }
 
-    public override void Initialize()
+    protected override void OnEnterImpl()
     {
-        // 外部から時間制限が渡される必要があります
-        // GameManager.Instance.StartSleepPhase()で設定してください
+        checkCount = maxCheckCount;
+        phaseStartTime = Time.time;
+        
+        {
+        if (checkButton != null)
+            checkButton.onClick.AddListener(OnCheckTime);
+        }
+        
+        if (wakeUpButton != null)
+            wakeUpButton.onClick.AddListener(OnWakeUp);
+            checkButton.interactable = true;
+        
+        UpdateUI();
+        StartCoroutine(ShowTimerBriefly());
     }
 
     public override void UpdatePhase()
     {
-        if (!IsActive) return;
-
         float elapsed = Time.time - phaseStartTime;
         float remaining = totalTime - elapsed;
 
         if (remaining <= 0)
         {
-            GameManager.Instance.ChangeState(GameState.Run); // 強制起床
+            // 強制起床
+        
+        if (checkButton != null)
+            checkButton.onClick.RemoveListener(OnCheckTime);
+        if (wakeUpButton != null)
+            wakeUpButton.onClick.RemoveListener(OnWakeUp);
+            RequestTransitionTo(GameState.Run);
         }
     }
 
-    public override void Cleanup()
+    protected override void OnExitImpl()
     {
-        checkCount = 0;
         StopAllCoroutines();
-    }
-
-    /// <summary>
-    /// 時間制限を指定して初期化
-    /// </summary>
-    public void InitializeWithTimeLimit(float limit)
-    {
-        totalTime = limit;
-        checkCount = 3;
-        phaseStartTime = Time.time;
-        
-        SetVisible(true);
-        checkButton.interactable = true;
-        UpdateUI();
-
-        // 最初だけ時間を表示
-        StartCoroutine(ShowTimerBriefly());
-    }
-
-    /// <summary>
-    /// 互換性維持用メソッド
-    /// </summary>
-    public void Initialize(float timeLimit)
-    {
-        totalTime = timeLimit;
-        checkCount = 3;
-        phaseStartTime = Time.time;
-        
-        SetVisible(true);
-        checkButton.interactable = true;
-        UpdateUI();
-
-        StartCoroutine(ShowTimerBriefly());
     }
 
     /// <summary>
@@ -91,7 +84,8 @@ public class SleepPhaseController : PhaseController
             UpdateUI();
             StartCoroutine(ShowTimerBriefly());
             
-            if (checkCount <= 0) checkButton.interactable = false;
+            if (checkCount <= 0 && checkButton != null)
+                checkButton.interactable = false;
         }
     }
 
@@ -100,7 +94,7 @@ public class SleepPhaseController : PhaseController
     /// </summary>
     public void OnWakeUp()
     {
-        GameManager.Instance.ChangeState(GameState.Run);
+        RequestTransitionTo(GameState.Run);
     }
 
     private void UpdateUI()
@@ -112,18 +106,26 @@ public class SleepPhaseController : PhaseController
     private IEnumerator ShowTimerBriefly()
     {
         float elapsed = Time.time - phaseStartTime;
-        float currentRem = Mathf.Max(0, totalTime - elapsed);
+        float currentRemaining = Mathf.Max(0, totalTime - elapsed);
         
         if (timerText != null)
         {
-            timerText.text = currentRem.ToString("F2");
+            timerText.text = currentRemaining.ToString("F2");
             timerText.gameObject.SetActive(true);
         }
         
-        yield return new WaitForSeconds(1.5f);
+        yield return new WaitForSeconds(timerDisplayDuration);
         
         if (timerText != null)
             timerText.gameObject.SetActive(false);
     }
-}
 
+    /// <summary>
+    /// 残り時間を取得
+    /// </summary>
+    public float GetRemainingTime()
+    {
+        float elapsed = Time.time - phaseStartTime;
+        return Mathf.Max(0, totalTime - elapsed);
+    }
+}
