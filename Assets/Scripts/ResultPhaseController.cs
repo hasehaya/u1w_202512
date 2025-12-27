@@ -33,10 +33,12 @@ public class ResultPhaseController : PhaseController
 
     protected override void OnEnterImpl()
     {
+        // デバッグ用
+        RequestTransitionTo(GameState.Title);
+        
         // GameManagerから直接データを取得
-        sleepDuration = GameManager.Instance.Data.SleepDuration;
         remainingTime = GameManager.Instance.Data.RemainingTime;
-        score = GameManager.Instance.Data.Score;
+        score = GameManager.Instance.Data.Score();
         
         SetupButtons();
         DisplayResult();

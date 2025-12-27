@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using DG.Tweening;
 
 /// <summary>
@@ -6,6 +7,7 @@ using DG.Tweening;
 /// </summary>
 public class Player : MonoBehaviour
 {
+    [SerializeField] private Image playerImage;
     [SerializeField] private RectTransform rectTransform;
 
     [Header("Position Settings")]
@@ -16,8 +18,20 @@ public class Player : MonoBehaviour
     [Header("Animation Settings")]
     [SerializeField] private float moveDuration = 0.3f;
 
+    [Header("Sprite Animation Settings")]
+    [SerializeField] private Sprite sprite1;
+    [SerializeField] private Sprite sprite2;
+    [SerializeField] private float spriteChangeInterval = 0.5f;
+
+    [Header("Auto Return Settings")]
+    [SerializeField] private float autoReturnDelay = 1.0f;
+
     private PlayerPosition currentPosition = PlayerPosition.Center;
     private Tween moveTween;
+    private float spriteChangeTimer = 0f;
+    private bool useFirstSprite = true;
+    private float autoReturnTimer = 0f;
+    private bool shouldAutoReturn = false;
 
     public PlayerPosition CurrentPosition => currentPosition;
 
@@ -29,7 +43,42 @@ public class Player : MonoBehaviour
             rectTransform.anchoredPosition = new Vector2(0f, centerPositionY);
         }
 
+        // 初期スプライトを設定
+        if (playerImage != null && sprite1 != null)
+        {
+            playerImage.sprite = sprite1;
+        }
+
         SubscribeToInputEvents();
+    }
+
+    private void Update()
+    {
+        // スプライトの切り替え処理
+        if (playerImage != null && sprite1 != null && sprite2 != null)
+        {
+            spriteChangeTimer += Time.deltaTime;
+
+            if (spriteChangeTimer >= spriteChangeInterval)
+            {
+                spriteChangeTimer = 0f;
+                useFirstSprite = !useFirstSprite;
+                playerImage.sprite = useFirstSprite ? sprite1 : sprite2;
+            }
+        }
+
+        // 自動復帰処理
+        if (shouldAutoReturn)
+        {
+            autoReturnTimer += Time.deltaTime;
+
+            if (autoReturnTimer >= autoReturnDelay)
+            {
+                shouldAutoReturn = false;
+                autoReturnTimer = 0f;
+                MoveToCenter();
+            }
+        }
     }
 
     private void OnDestroy()
@@ -59,10 +108,26 @@ public class Player : MonoBehaviour
         switch (direction)
         {
             case SwipeDirection.Left:
-                MoveToLeft();
+                // 右にいる場合は中央へ、それ以外は左へ
+                if (currentPosition == PlayerPosition.Right)
+                {
+                    MoveToCenter();
+                }
+                else if (currentPosition == PlayerPosition.Center)
+                {
+                    MoveToLeft();
+                }
                 break;
             case SwipeDirection.Right:
-                MoveToRight();
+                // 左にいる場合は中央へ、それ以外は右へ
+                if (currentPosition == PlayerPosition.Left)
+                {
+                    MoveToCenter();
+                }
+                else if (currentPosition == PlayerPosition.Center)
+                {
+                    MoveToRight();
+                }
                 break;
         }
     }
@@ -73,6 +138,10 @@ public class Player : MonoBehaviour
 
         currentPosition = PlayerPosition.Left;
         AnimateToPosition(new Vector2(leftPositionX, centerPositionY));
+        
+        // 自動復帰タイマーを開始
+        autoReturnTimer = 0f;
+        shouldAutoReturn = true;
     }
 
     public void MoveToRight()
@@ -81,12 +150,20 @@ public class Player : MonoBehaviour
 
         currentPosition = PlayerPosition.Right;
         AnimateToPosition(new Vector2(rightPositionX, centerPositionY));
+        
+        // 自動復帰タイマーを開始
+        autoReturnTimer = 0f;
+        shouldAutoReturn = true;
     }
 
     public void MoveToCenter()
     {
         currentPosition = PlayerPosition.Center;
         AnimateToPosition(new Vector2(0f, centerPositionY));
+        
+        // 自動復帰タイマーを停止
+        shouldAutoReturn = false;
+        autoReturnTimer = 0f;
     }
 
     private void AnimateToPosition(Vector2 targetPosition)

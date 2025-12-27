@@ -23,23 +23,20 @@ public class Obstacle : MonoBehaviour
     private Vector2 startPos; // 始点
     private Vector2 endPos; // 終点
     private Tween currentTween;
-    private int positionIndex; // 0: Left Start, 1: Left End, 2: Right Start, 3: Right End
 
     public ObstaclePosition CurrentPosition => currentPos;
     public bool IsActive { get; private set; }
 
-    // posIndex: 0=Left Start, 1=Left End, 2=Right Start, 3=Right End
-    public void Spawn(ObstaclePosition pos, int posIndex)
+    public void Spawn(ObstaclePosition pos)
     {
         // 既存のTweenをキャンセル
         currentTween?.Kill();
 
         currentPos = pos;
-        positionIndex = posIndex;
         IsActive = true;
         gameObject.SetActive(true);
 
-        SetupPosition(pos, posIndex);
+        SetupPosition(pos);
         AnimateObstacle();
     }
 
@@ -50,39 +47,19 @@ public class Obstacle : MonoBehaviour
         gameObject.SetActive(false);
     }
 
-    private void SetupPosition(ObstaclePosition pos, int posIndex)
+    private void SetupPosition(ObstaclePosition pos)
     {
         switch (pos)
         {
             case ObstaclePosition.Left:
-                if (posIndex == 0) // Left Start (上)
-                {
-                    startPos = leftStartPos;
-                    endPos = leftEndPos;
-                }
-                else // Left End (下)
-                {
-                    startPos = leftEndPos;
-                    endPos = leftStartPos;
-                }
-                
-                // 初期位置を始点に設定
+                startPos = leftStartPos;
+                endPos = leftEndPos;
                 rectTransform.anchoredPosition = startPos;
                 break;
                 
             case ObstaclePosition.Right:
-                if (posIndex == 2) // Right Start (上)
-                {
-                    startPos = rightStartPos;
-                    endPos = rightEndPos;
-                }
-                else // Right End (下)
-                {
-                    startPos = rightEndPos;
-                    endPos = rightStartPos;
-                }
-                
-                // 初期位置を始点に設定
+                startPos = rightStartPos;
+                endPos = rightEndPos;
                 rectTransform.anchoredPosition = startPos;
                 break;
         }

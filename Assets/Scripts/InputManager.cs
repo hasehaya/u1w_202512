@@ -10,7 +10,7 @@ public class InputManager : MonoBehaviour
 
     private Vector2 startPos;
     private bool isTouching = false;
-    private const float SWIPE_THRESHOLD = 50f; // ピクセル単位の閾値
+    private const float SWIPE_THRESHOLD = 80f; // ピクセル単位の閾値
 
     private void Awake()
     {

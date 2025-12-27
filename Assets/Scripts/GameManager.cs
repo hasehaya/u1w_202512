@@ -18,10 +18,6 @@ public class GameManager : MonoBehaviour
     [SerializeField] private RunPhaseController runController;
     [SerializeField] private ResultPhaseController resultController;
 
-    [Header("Game Settings")]
-    [SerializeField] private float minTime = 15f;
-    [SerializeField] private float maxTime = 25f;
-
     // ゲームデータ
     private GameData gameData;
     public GameData Data => gameData;
@@ -41,7 +37,6 @@ public class GameManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
-        InitializeGameData();
         InitializePhaseControllers();
     }
     
@@ -53,15 +48,6 @@ public class GameManager : MonoBehaviour
     private void Update()
     {
         UpdateCurrentPhase();
-    }
-
-    private void InitializeGameData()
-    {
-        gameData = new GameData
-        {
-            MinTime = minTime,
-            MaxTime = maxTime
-        };
     }
 
     private void InitializePhaseControllers()
@@ -76,6 +62,19 @@ public class GameManager : MonoBehaviour
             { GameState.Run, runController },
             { GameState.Result, resultController }
         };
+        
+        HideAllPhaseControllers();
+    }
+
+    private void HideAllPhaseControllers()
+    {
+        foreach (var controller in phaseControllers.Values)
+        {
+            if (controller != null)
+            {
+                controller.gameObject.SetActive(false);
+            }
+        }
     }
 
     private void UpdateCurrentPhase()
@@ -95,10 +94,6 @@ public class GameManager : MonoBehaviour
 
         CurrentState = newState;
 
-        // フェーズ固有のデータ処理
-        ProcessPhaseData(newState);
-
-        // 新しいフェーズを開始
         EnterNewPhase(newState);
     }
 
@@ -120,34 +115,10 @@ public class GameManager : MonoBehaviour
     }
 
     /// <summary>
-    /// フェーズ固有のデータ処理
-    /// </summary>
-    private void ProcessPhaseData(GameState newState)
-    {
-        switch (newState)
-        {
-            case GameState.Sleep:
-                gameData.StartSleep();
-                sleepController.SetTimeLimit(gameData.TotalTimeLimit);
-                break;
-
-            case GameState.Run:
-                gameData.EndSleep();
-                runController.SetRemainingTime(gameData.RemainingTime);
-                break;
-
-            case GameState.Result:
-                resultController.SetResultData(gameData.SleepDuration, gameData.RemainingTime, gameData.Score);
-                break;
-        }
-    }
-
-    /// <summary>
     /// ゲームクリア処理
     /// </summary>
     public void HandleGameClear(float finalRemainingTime)
     {
-        gameData.SetGameClear(finalRemainingTime);
         ChangeState(GameState.Result);
     }
 
@@ -156,7 +127,6 @@ public class GameManager : MonoBehaviour
     /// </summary>
     public void HandleGameOver()
     {
-        gameData.SetGameOver();
         ChangeState(GameState.Result);
     }
 

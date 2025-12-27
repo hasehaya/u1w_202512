@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using UnityEngine.UI;
 using System.Collections;
 
 /// <summary>
@@ -9,14 +8,11 @@ public class ObstacleManager : MonoBehaviour
 {
     [Header("UI Elements")]
     [SerializeField] private GameObject attentionObject; // Attention表示オブジェクト
-    [SerializeField] private Image hintImage; // 左右のヒント画像
-    [SerializeField] private Sprite leftHintSprite; // 左向き矢印画像
-    [SerializeField] private Sprite rightHintSprite; // 右向き矢印画像
+    [SerializeField] private GameObject leftArrowObject; // 左向き矢印オブジェクト
+    [SerializeField] private GameObject rightArrowObject; // 右向き矢印オブジェクト
     
     [Header("Obstacle Prefab")]
     [SerializeField] private GameObject obstaclePrefab;
-    
-    [Header("Spawn Parent")]
     [SerializeField] private Transform obstacleParent;
     
     [Header("Animation Settings")]
@@ -50,19 +46,19 @@ public class ObstacleManager : MonoBehaviour
             Destroy(currentObstacle.gameObject);
             currentObstacle = null;
         }
-
-        UpdateUI(pos);
-        gameObject.SetActive(true);
         
-        // Attention表示後にObstacleを生成するコルーチンを開始
+        // Attention表示→矢印表示→Obstacleを生成するコルーチンを開始
         spawnCoroutine = StartCoroutine(SpawnSequence(pos, posIndex));
     }
 
     /// <summary>
-    /// Attention表示→点滅→消去→Obstacle生成のシーケンス
+    /// Attention表示→点滅→消去→矢印表示→Obstacle生成のシーケンス
     /// </summary>
     private IEnumerator SpawnSequence(ObstaclePosition pos, int posIndex)
     {
+        // Attentionと同時に矢印を表示
+        ShowArrow(pos);
+        
         // Attention表示
         if (attentionObject != null)
         {
@@ -88,8 +84,9 @@ public class ObstacleManager : MonoBehaviour
             attentionObject.SetActive(false);
         }
 
+
         // Obstacleを生成してスライドイン
-        GameObject obstacleObj = Instantiate(obstaclePrefab, obstacleParent != null ? obstacleParent : transform);
+        GameObject obstacleObj = Instantiate(obstaclePrefab, obstacleParent);
         currentObstacle = obstacleObj.GetComponent<Obstacle>();
 
         if (currentObstacle == null)
@@ -100,24 +97,9 @@ public class ObstacleManager : MonoBehaviour
         }
 
         // Obstacleをスライドインさせる（初期位置が始点）
-        currentObstacle.Spawn(pos, posIndex);
+        currentObstacle.Spawn(pos);
     }
-
-    /// <summary>
-    /// 現在の障害物を削除（RunPhaseControllerから呼び出される）
-    /// </summary>
-    public void DespawnCurrentObstacle()
-    {
-        if (currentObstacle != null)
-        {
-            currentObstacle.Despawn();
-            Destroy(currentObstacle.gameObject);
-            currentObstacle = null;
-        }
-        
-        gameObject.SetActive(false);
-    }
-
+    
     /// <summary>
     /// 現在の障害物を非表示にする
     /// </summary>
@@ -136,29 +118,46 @@ public class ObstacleManager : MonoBehaviour
             attentionObject.SetActive(false);
         }
 
+        // 矢印を非表示
+        HideArrow();
+
         if (currentObstacle != null)
         {
             currentObstacle.Despawn();
             Destroy(currentObstacle.gameObject);
             currentObstacle = null;
         }
-        
-        gameObject.SetActive(false);
     }
 
-    private void UpdateUI(ObstaclePosition pos)
+    /// <summary>
+    /// 左右の矢印を表示
+    /// </summary>
+    private void ShowArrow(ObstaclePosition pos)
     {
-        if (hintImage == null) return;
-
-        switch (pos)
+        if (leftArrowObject != null)
         {
-            case ObstaclePosition.Left:
-                hintImage.sprite = leftHintSprite;
-                break;
-                
-            case ObstaclePosition.Right:
-                hintImage.sprite = rightHintSprite;
-                break;
+            leftArrowObject.SetActive(pos == ObstaclePosition.Right);
+        }
+        
+        if (rightArrowObject != null)
+        {
+            rightArrowObject.SetActive(pos == ObstaclePosition.Left);
+        }
+    }
+
+    /// <summary>
+    /// 矢印を非表示にする
+    /// </summary>
+    private void HideArrow()
+    {
+        if (leftArrowObject != null)
+        {
+            leftArrowObject.SetActive(false);
+        }
+        
+        if (rightArrowObject != null)
+        {
+            rightArrowObject.SetActive(false);
         }
     }
 
