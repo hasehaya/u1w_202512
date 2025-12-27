@@ -14,7 +14,7 @@ public class GradientMatManager : MonoBehaviour
 
     private void Start()
     {
-        GetComponent<Image>();
+        _image = GetComponent<Image>();
         _material = _image.material;
 
         SyncMatValueToSlider(syncTargetSlider.value);
