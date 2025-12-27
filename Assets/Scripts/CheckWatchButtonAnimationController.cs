@@ -8,6 +8,7 @@ public class CheckWatchButtonAnimationController : MonoBehaviour
     [SerializeField] private AnimationClip animClip;
 
     private Animation _animation;
+    private Coroutine _coroutine;
     
     void Start()
     {
@@ -22,7 +23,19 @@ public class CheckWatchButtonAnimationController : MonoBehaviour
         _animation.AddClip(animClip, animClip.name);
         _animation[animClip.name].speed = animSpeed;
         
-        StartCoroutine(PlayAnimationLoop());
+        _coroutine = StartCoroutine(PlayAnimationLoop());
+    }
+
+    private void OnEnable()
+    {
+        if(_coroutine == null)
+            _coroutine = StartCoroutine(PlayAnimationLoop());
+    }
+
+    private void OnDisable()
+    {
+        StopCoroutine(_coroutine);
+        _coroutine = null;
     }
 
     private IEnumerator PlayAnimationLoop()
