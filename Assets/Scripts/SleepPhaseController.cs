@@ -20,16 +20,15 @@ public class SleepPhaseController : PhaseController
 
     [SerializeField] private Sprite[] checkButtonSprites;
 
-    [Header("Settings")]
+    [Header("Settings")] //GameManagerに置き換える？
     [SerializeField] private Vector2 decreaseRateRange = new Vector2(3f, 10f);
     [SerializeField] private Vector2 popUpStateThreshold = new Vector2(300f, 100f);
-
-    private int maxCheckCount;
+    
     private int currenCheckCount;
     
     private float timeDecreaseRate = 1.0f;
     
-    // 
+    // GameManagerに置き換える予定
     private float remainingTime = 600.0f;
     
     private CheckWatchAnimationController checkWatchController;
@@ -91,7 +90,7 @@ public class SleepPhaseController : PhaseController
             
         if (remainingTime <= 0)
         {
-            RequestTransitionTo(GameState.Result);
+            RequestTransitionTo(GameState.GameOver);
         }
     }
 
@@ -103,7 +102,7 @@ public class SleepPhaseController : PhaseController
             
         if (remainingTime <= 0)
         {
-            RequestTransitionTo(GameState.Result);
+            RequestTransitionTo(GameState.GameOver);
         }
     }
 
