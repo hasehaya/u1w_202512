@@ -62,10 +62,8 @@ public class SleepPhaseController : PhaseController
         if (remaining <= 0)
         {
             // 寝過ごした場合は即リザルトへ
-            GameManager.Instance.Data.EndSleep();
-            if (GameManager.Instance.Data.IsOverslept)
+            if (GameManager.Instance.Data.RemainingTime <= 0)
             {
-                GameManager.Instance.Data.SetGameOver();
                 if (checkButton != null)
                     checkButton.onClick.RemoveListener(OnCheckTime);
                 if (wakeUpButton != null)
