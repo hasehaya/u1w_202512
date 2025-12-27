@@ -85,6 +85,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8821599440454683285}
   - component: {fileID: 8726408595713158739}
+  - component: {fileID: 3352576730510167999}
   m_Layer: 5
   m_Name: Run
   m_TagString: Untagged
@@ -124,8 +125,32 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5310cd8d99c64fcda85e3aa89368a357, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RunPhaseController
-  canvasGroup: {fileID: 0}
   timerText: {fileID: 0}
   progressBar: {fileID: 0}
   gabaText: {fileID: 0}
-  obstacleController: {fileID: 0}
+  player: {fileID: 0}
+  obstacleManager: {fileID: 0}
+  requiredClicks: 45
+  safeTimeDuration: 0.5
+  minObstacles: 3
+  maxObstacles: 6
+--- !u!114 &3352576730510167999
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6328220173131608120}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d38fa7ba90214d73a6438c477e887ac8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ObstacleController
+  attentionObject: {fileID: 0}
+  hintImage: {fileID: 0}
+  leftHintSprite: {fileID: 0}
+  rightHintSprite: {fileID: 0}
+  obstaclePrefab: {fileID: 0}
+  obstacleParent: {fileID: 0}
+  attentionBlinkDuration: 1
+  attentionBlinkCount: 3
