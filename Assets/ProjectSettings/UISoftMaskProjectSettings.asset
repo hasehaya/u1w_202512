@@ -19,14 +19,24 @@ MonoBehaviour:
   m_HideGeneratedComponents: 1
   m_ShaderVariantRegistry:
     m_OptionalShaders: []
-    m_Asset: {fileID: 587301890688624514}
+    m_Asset: {fileID: 2217486360841442704}
     m_ErrorOnUnregisteredVariant: 0
     m_UnregisteredVariants: []
---- !u!200 &587301890688624514
+--- !u!200 &2217486360841442704
 ShaderVariantCollection:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: ShaderVariants
-  m_Shaders: {}
+  m_Shaders:
+  - first: {fileID: -6465566751694194690, guid: 6b3f5d037f723594a8017802296b12a6, type: 3}
+    second:
+      variants:
+      - keywords: 
+        passType: 0
+  - first: {fileID: 4800000, guid: 2933b413a51fc4ff3a83c7ef4177ae84, type: 3}
+    second:
+      variants:
+      - keywords: 
+        passType: 0
