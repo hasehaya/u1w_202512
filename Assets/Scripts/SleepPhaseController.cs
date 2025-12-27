@@ -2,7 +2,11 @@
 using UnityEngine.UI;
 using System.Collections;
 
-public class SleepPhaseController : MonoBehaviour
+/// <summary>
+/// 睡眠フェーズコントローラー
+/// プレイヤーが目を覚ます時間を決めるフェーズ
+/// </summary>
+public class SleepPhaseController : PhaseController
 {
     [SerializeField] private Text timerText;
     [SerializeField] private Text checkCountText;
@@ -12,15 +16,47 @@ public class SleepPhaseController : MonoBehaviour
     private int checkCount = 3;
     private float totalTime;
     private float phaseStartTime;
-    private bool isRunning = false;
 
-    public void Initialize(float timeLimit)
+    private void Start()
     {
-        totalTime = timeLimit;
+        phaseType = GameState.Sleep;
+    }
+
+    public override void Initialize()
+    {
+        // 外部から時間制限が渡される必要があります
+        // GameManager.Instance.StartSleepPhase()で設定してください
+    }
+
+    public override void UpdatePhase()
+    {
+        if (!IsActive) return;
+
+        float elapsed = Time.time - phaseStartTime;
+        float remaining = totalTime - elapsed;
+
+        if (remaining <= 0)
+        {
+            GameManager.Instance.ChangeState(GameState.Run); // 強制起床
+        }
+    }
+
+    public override void Cleanup()
+    {
+        checkCount = 0;
+        StopAllCoroutines();
+    }
+
+    /// <summary>
+    /// 時間制限を指定して初期化
+    /// </summary>
+    public void InitializeWithTimeLimit(float limit)
+    {
+        totalTime = limit;
         checkCount = 3;
         phaseStartTime = Time.time;
-        isRunning = true;
         
+        SetVisible(true);
         checkButton.interactable = true;
         UpdateUI();
 
@@ -28,21 +64,25 @@ public class SleepPhaseController : MonoBehaviour
         StartCoroutine(ShowTimerBriefly());
     }
 
-    private void Update()
+    /// <summary>
+    /// 互換性維持用メソッド
+    /// </summary>
+    public void Initialize(float timeLimit)
     {
-        if (!isRunning || GameManager.Instance.CurrentState != GameState.Sleep) return;
+        totalTime = timeLimit;
+        checkCount = 3;
+        phaseStartTime = Time.time;
+        
+        SetVisible(true);
+        checkButton.interactable = true;
+        UpdateUI();
 
-        float elapsed = Time.time - phaseStartTime;
-        float remaining = totalTime - elapsed;
-
-        if (remaining <= 0)
-        {
-            isRunning = false;
-            GameManager.Instance.ChangeState(GameState.Run); // 強制起床
-        }
+        StartCoroutine(ShowTimerBriefly());
     }
 
-    // ボタンから呼ばれる
+    /// <summary>
+    /// 時間チェックボタン処理
+    /// </summary>
     public void OnCheckTime()
     {
         if (checkCount > 0)
@@ -55,16 +95,18 @@ public class SleepPhaseController : MonoBehaviour
         }
     }
 
-    // ボタンから呼ばれる
+    /// <summary>
+    /// 起床ボタン処理
+    /// </summary>
     public void OnWakeUp()
     {
-        isRunning = false;
         GameManager.Instance.ChangeState(GameState.Run);
     }
 
     private void UpdateUI()
     {
-        checkCountText.text = $"{checkCount}";
+        if (checkCountText != null)
+            checkCountText.text = $"{checkCount}";
     }
 
     private IEnumerator ShowTimerBriefly()
@@ -72,11 +114,16 @@ public class SleepPhaseController : MonoBehaviour
         float elapsed = Time.time - phaseStartTime;
         float currentRem = Mathf.Max(0, totalTime - elapsed);
         
-        timerText.text = currentRem.ToString("F2");
-        timerText.gameObject.SetActive(true);
+        if (timerText != null)
+        {
+            timerText.text = currentRem.ToString("F2");
+            timerText.gameObject.SetActive(true);
+        }
         
         yield return new WaitForSeconds(1.5f);
         
-        timerText.gameObject.SetActive(false);
+        if (timerText != null)
+            timerText.gameObject.SetActive(false);
     }
 }
+

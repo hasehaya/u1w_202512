@@ -1,6 +1,7 @@
 ﻿public enum GameState
 {
     Title,
+    Loading,
     Prologue,
     Tutorial,
     Sleep,
