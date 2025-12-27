@@ -84,9 +84,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4942864712374972419}
-  - component: {fileID: 3468554838140688971}
+  - component: {fileID: 6923112918959923607}
   m_Layer: 5
-  m_Name: Result
+  m_Name: GameOver
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -112,7 +112,7 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &3468554838140688971
+--- !u!114 &6923112918959923607
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -121,12 +121,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 1971890271497119001}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8e25280a900d4e598f1e4cb9f62bb8d6, type: 3}
+  m_Script: {fileID: 11500000, guid: f3c08b826fe642feb4c00660a58c2ae0, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ResultPhaseController
+  m_EditorClassIdentifier: Assembly-CSharp::GameOverPhaseController
   scoreText: {fileID: 0}
   resultText: {fileID: 0}
   sleepTimeText: {fileID: 0}
-  remainingTimeText: {fileID: 0}
+  reasonText: {fileID: 0}
   retryButton: {fileID: 0}
   titleButton: {fileID: 0}
