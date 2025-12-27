@@ -20,6 +20,8 @@ public class TutorialPhaseController : PhaseController
     {
         currentStage = 0;
         SetupButtons();
+        // デバッグ用
+        RequestTransitionTo(GameState.Sleep);
     }
 
     public override void UpdatePhase()

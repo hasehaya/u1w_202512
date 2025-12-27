@@ -35,6 +35,9 @@ public class SleepPhaseController : PhaseController
 
     protected override void OnEnterImpl()
     {
+        // デバッグ用
+        RequestTransitionTo(GameState.Run);
+        
         checkCount = maxCheckCount;
         phaseStartTime = Time.time;
         
@@ -58,12 +61,24 @@ public class SleepPhaseController : PhaseController
 
         if (remaining <= 0)
         {
-            // 強制起床
+            // 寝過ごした場合は即リザルトへ
+            GameManager.Instance.Data.EndSleep();
+            if (GameManager.Instance.Data.IsOverslept)
+            {
+                GameManager.Instance.Data.SetGameOver();
+                if (checkButton != null)
+                    checkButton.onClick.RemoveListener(OnCheckTime);
+                if (wakeUpButton != null)
+                    wakeUpButton.onClick.RemoveListener(OnWakeUp);
+                RequestTransitionTo(GameState.Result);
+                return;
+            }
         
-        if (checkButton != null)
-            checkButton.onClick.RemoveListener(OnCheckTime);
-        if (wakeUpButton != null)
-            wakeUpButton.onClick.RemoveListener(OnWakeUp);
+            // 時間内に起きた場合はRunフェーズへ
+            if (checkButton != null)
+                checkButton.onClick.RemoveListener(OnCheckTime);
+            if (wakeUpButton != null)
+                wakeUpButton.onClick.RemoveListener(OnWakeUp);
             RequestTransitionTo(GameState.Run);
         }
     }

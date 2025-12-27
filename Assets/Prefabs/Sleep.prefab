@@ -319,7 +319,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1959359381116357855
 RectTransform:
   m_ObjectHideFlags: 0
@@ -362,11 +362,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2b07abd2ef2249ada366f14128fbafeb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SleepPhaseController
-  canvasGroup: {fileID: 0}
   timerText: {fileID: 0}
   checkCountText: {fileID: 0}
   checkButton: {fileID: 0}
+  wakeUpButton: {fileID: 0}
   sheepImage: {fileID: 0}
+  maxCheckCount: 3
+  timerDisplayDuration: 1.5
 --- !u!1001 &1147326585540132089
 PrefabInstance:
   m_ObjectHideFlags: 0

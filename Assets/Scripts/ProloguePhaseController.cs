@@ -20,6 +20,9 @@ public class ProloguePhaseController : PhaseController
         
         if (skipButton != null)
             skipButton.onClick.AddListener(OnClickSkip);
+        
+        // デバッグ用
+        RequestTransitionTo(GameState.Tutorial);
     }
 
     public override void UpdatePhase()

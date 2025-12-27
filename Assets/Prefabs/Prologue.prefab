@@ -91,7 +91,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &9148950658612091941
 RectTransform:
   m_ObjectHideFlags: 0
@@ -124,5 +124,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ab1acba44e1440bc9a2e291912c5a556, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ProloguePhaseController
-  canvasGroup: {fileID: 0}
   displayDuration: 5
+  skipButton: {fileID: 0}

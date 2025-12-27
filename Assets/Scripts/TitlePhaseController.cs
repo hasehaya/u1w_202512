@@ -33,7 +33,7 @@ public class TitlePhaseController : PhaseController
     /// </summary>
     private void OnClickStart()
     {
-        RequestTransitionTo(GameState.Prologue);
+        RequestTransitionTo(GameState.Loading);
     }
 }
 

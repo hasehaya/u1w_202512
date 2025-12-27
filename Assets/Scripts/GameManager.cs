@@ -30,8 +30,6 @@ public class GameManager : MonoBehaviour
     public GameState CurrentState { get; private set; }
     private PhaseController currentPhaseController;
     private Dictionary<GameState, PhaseController> phaseControllers;
-    private Dictionary<GameState, GameObject> panelMap;
-
 
     private void Awake()
     {
@@ -97,9 +95,6 @@ public class GameManager : MonoBehaviour
 
         CurrentState = newState;
 
-        // UIパネルを切り替え
-        SwitchPanel(newState);
-
         // フェーズ固有のデータ処理
         ProcessPhaseData(newState);
 
@@ -125,25 +120,6 @@ public class GameManager : MonoBehaviour
     }
 
     /// <summary>
-    /// UIパネルを切り替え
-    /// </summary>
-    private void SwitchPanel(GameState state)
-    {
-        // すべてのパネルを非表示
-        foreach (var panel in panelMap.Values)
-        {
-            if (panel != null)
-                panel.SetActive(false);
-        }
-
-        // 対象のパネルのみ表示
-        if (panelMap.TryGetValue(state, out GameObject targetPanel) && targetPanel != null)
-        {
-            targetPanel.SetActive(true);
-        }
-    }
-
-    /// <summary>
     /// フェーズ固有のデータ処理
     /// </summary>
     private void ProcessPhaseData(GameState newState)
@@ -157,13 +133,6 @@ public class GameManager : MonoBehaviour
 
             case GameState.Run:
                 gameData.EndSleep();
-                if (gameData.IsOverslept)
-                {
-                    // 寝過ごした場合は即リザルトへ
-                    gameData.SetGameOver();
-                    ChangeState(GameState.Result);
-                    return;
-                }
                 runController.SetRemainingTime(gameData.RemainingTime);
                 break;
 

@@ -91,7 +91,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &4942864712374972419
 RectTransform:
   m_ObjectHideFlags: 0
@@ -124,8 +124,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8e25280a900d4e598f1e4cb9f62bb8d6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ResultPhaseController
-  canvasGroup: {fileID: 0}
   scoreText: {fileID: 0}
   resultText: {fileID: 0}
+  sleepTimeText: {fileID: 0}
+  remainingTimeText: {fileID: 0}
   retryButton: {fileID: 0}
   titleButton: {fileID: 0}
