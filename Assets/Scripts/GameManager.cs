@@ -76,6 +76,19 @@ public class GameManager : MonoBehaviour
             { GameState.Run, runController },
             { GameState.Result, resultController }
         };
+        
+        HideAllPhaseControllers();
+    }
+
+    private void HideAllPhaseControllers()
+    {
+        foreach (var controller in phaseControllers.Values)
+        {
+            if (controller != null)
+            {
+                controller.gameObject.SetActive(false);
+            }
+        }
     }
 
     private void UpdateCurrentPhase()

@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 using System.Collections.Generic;
 
 /// <summary>
@@ -9,9 +10,9 @@ using System.Collections.Generic;
 public class RunPhaseController : PhaseController
 {
     [Header("UI")]
-    [SerializeField] private Text timerText;
+    [SerializeField] private TextMeshProUGUI timerText;
     [SerializeField] private Slider progressBar;
-    [SerializeField] private GameObject gabaText;
+    [SerializeField] private Button tapButton;
 
     [Header("Player")]
     [SerializeField] private Player player;
@@ -20,10 +21,10 @@ public class RunPhaseController : PhaseController
     [SerializeField] private ObstacleManager obstacleManager;
 
     [Header("Settings")]
-    [SerializeField] private float requiredClicks = 45f;
-    [SerializeField] private float safeTimeDuration = 0.5f;
-    [SerializeField] private int minObstacles = 3;
-    [SerializeField] private int maxObstacles = 6;
+    [SerializeField] private float requiredClicks;
+    [SerializeField] private float safeTimeDuration;
+    [SerializeField] private int minObstacles;
+    [SerializeField] private int maxObstacles;
 
     private float currentRemainingTime;
     private float progress;
@@ -53,18 +54,26 @@ public class RunPhaseController : PhaseController
 
     private void SubscribeToInputEvents()
     {
+        if (tapButton != null)
+        {
+            tapButton.onClick.AddListener(HandleTap);
+        }
+        
         if (InputManager.Instance != null)
         {
-            InputManager.Instance.OnTap += HandleTap;
             InputManager.Instance.OnSwipe += HandleSwipe;
         }
     }
 
     private void UnsubscribeFromInputEvents()
     {
+        if (tapButton != null)
+        {
+            tapButton.onClick.RemoveListener(HandleTap);
+        }
+        
         if (InputManager.Instance != null)
         {
-            InputManager.Instance.OnTap -= HandleTap;
             InputManager.Instance.OnSwipe -= HandleSwipe;
         }
     }
@@ -82,7 +91,6 @@ public class RunPhaseController : PhaseController
             player.ResetPosition();
 
         GenerateObstacleTriggers();
-        ShowGabaEffect();
     }
 
     public override void UpdatePhase()
@@ -135,13 +143,11 @@ public class RunPhaseController : PhaseController
 
         bool isCollision = false;
 
-        // 左側の障害物に左側にいる場合は衝突
-        if (obstaclePos == ObstaclePosition.Left && playerPos == PlayerPosition.Left)
+        if (obstaclePos == ObstaclePosition.Left && playerPos != PlayerPosition.Right)
         {
             isCollision = true;
         }
-        // 右側の障害物に右側にいる場合は衝突
-        else if (obstaclePos == ObstaclePosition.Right && playerPos == PlayerPosition.Right)
+        else if (obstaclePos == ObstaclePosition.Right && playerPos != PlayerPosition.Left)
         {
             isCollision = true;
         }
@@ -218,7 +224,7 @@ public class RunPhaseController : PhaseController
     {
         if (obstacleManager != null)
         {
-            obstacleManager.DespawnCurrentObstacle();
+            obstacleManager.Hide();
         }
         
         // セーフタイムを終了
@@ -229,21 +235,6 @@ public class RunPhaseController : PhaseController
     {
         if (timerText != null)
             timerText.text = Mathf.Max(0, currentRemainingTime).ToString("F2");
-    }
-
-    private void ShowGabaEffect()
-    {
-        if (gabaText != null)
-        {
-            gabaText.SetActive(true);
-            Invoke(nameof(HideGabaEffect), 1f);
-        }
-    }
-
-    private void HideGabaEffect()
-    {
-        if (gabaText != null)
-            gabaText.SetActive(false);
     }
 
     /// <summary>

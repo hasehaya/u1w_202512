@@ -41,14 +41,14 @@ public class SleepPhaseController : PhaseController
         checkCount = maxCheckCount;
         phaseStartTime = Time.time;
         
-        {
         if (checkButton != null)
+        {
             checkButton.onClick.AddListener(OnCheckTime);
+            checkButton.interactable = true;
         }
         
         if (wakeUpButton != null)
             wakeUpButton.onClick.AddListener(OnWakeUp);
-            checkButton.interactable = true;
         
         UpdateUI();
         StartCoroutine(ShowTimerBriefly());
