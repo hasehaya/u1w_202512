@@ -16,7 +16,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] private TutorialPhaseController tutorialController;
     [SerializeField] private SleepPhaseController sleepController;
     [SerializeField] private RunPhaseController runController;
-    [SerializeField] private ResultPhaseController resultController;
+    [SerializeField] private GameClearPhaseController gameClearController;
+    [SerializeField] private GameOverPhaseController gameOverController;
 
     // ゲームデータ
     private GameData gameData;
@@ -37,6 +38,7 @@ public class GameManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
+        gameData = new GameData();
         InitializePhaseControllers();
     }
     
@@ -60,7 +62,8 @@ public class GameManager : MonoBehaviour
             { GameState.Tutorial, tutorialController },
             { GameState.Sleep, sleepController },
             { GameState.Run, runController },
-            { GameState.Result, resultController }
+            { GameState.GameClear, gameClearController },
+            { GameState.GameOver, gameOverController }
         };
         
         HideAllPhaseControllers();
@@ -112,22 +115,6 @@ public class GameManager : MonoBehaviour
             currentPhaseController = controller;
             currentPhaseController?.OnPhaseEnter();
         }
-    }
-
-    /// <summary>
-    /// ゲームクリア処理
-    /// </summary>
-    public void HandleGameClear(float finalRemainingTime)
-    {
-        ChangeState(GameState.Result);
-    }
-
-    /// <summary>
-    /// ゲームオーバー処理
-    /// </summary>
-    public void HandleGameOver()
-    {
-        ChangeState(GameState.Result);
     }
 
     /// <summary>

@@ -1,10 +1,4 @@
-﻿﻿using UnityEngine;
-
-/// <summary>
-/// ゲームデータを管理するクラス
-/// 各フェーズ間でのデータ共有を担当
-/// </summary>
-public class GameData
+﻿public class GameData
 {
     public const int TotalTimeLimit = 40;
     public int CheckCount = 0;
