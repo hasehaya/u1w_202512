@@ -1,6 +1,7 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.UI;
-using System.Collections;
+using Random = UnityEngine.Random;
 
 /// <summary>
 /// 睡眠フェーズコントローラー
@@ -9,8 +10,7 @@ using System.Collections;
 public class SleepPhaseController : PhaseController
 {
     [Header("UI References")]
-    [SerializeField] private Text timerText;
-    [SerializeField] private Text checkCountText;
+    [SerializeField] private TMPro.TMP_Text remainingTimeText;
     [SerializeField] private Button checkButton;
     [SerializeField] private Button wakeUpButton;
     [SerializeField] private Button backSleepButton;
@@ -18,13 +18,19 @@ public class SleepPhaseController : PhaseController
     [SerializeField] private GameObject dream;
     [SerializeField] private GameObject checkWatch;
 
-    [Header("Settings")]
-    [SerializeField] private int maxCheckCount = 3;
-    [SerializeField] private float timerDisplayDuration = 1.5f;
+    [SerializeField] private Sprite[] checkButtonSprites;
 
-    private int checkCount;
-    private float totalTime;
-    private float phaseStartTime;
+    [Header("Settings")]
+    [SerializeField] private Vector2 decreaseRateRange = new Vector2(3f, 10f);
+    [SerializeField] private Vector2 popUpStateThreshold = new Vector2(300f, 100f);
+
+    private int maxCheckCount;
+    private int currenCheckCount;
+    
+    private float timeDecreaseRate = 1.0f;
+    
+    // 
+    private float remainingTime = 600.0f;
     
     private CheckWatchAnimationController checkWatchController;
 
@@ -39,16 +45,10 @@ public class SleepPhaseController : PhaseController
         CheckWatch
     }
 
-    /// <summary>
-    /// 時間制限を設定（GameManagerから呼び出される）
-    /// </summary>
-    public void SetTimeLimit(float limit)
-    {
-        totalTime = limit;
-    }
-
     protected override void OnEnterImpl()
     {
+        currenCheckCount = checkButtonSprites.Length;
+        
         checkWatchController = checkWatch.GetComponent<CheckWatchAnimationController>();
         checkButton.onClick.AddListener(() => ChangeState(SleepGameState.CheckWatch));
         wakeUpButton.onClick.AddListener(() => RequestTransitionTo(GameState.Run));
@@ -61,22 +61,50 @@ public class SleepPhaseController : PhaseController
         {
             wakeUpButton.enabled = true;
             backSleepButton.enabled = true;
+            
+            if(currenCheckCount == 0)
+                backSleepButton.interactable = false;
         };
         checkWatchController.OnExitAnimationComplete += () =>
         {
             checkWatch.SetActive(false);
             dream.SetActive(true);
+            checkButton.image.sprite = checkButtonSprites[currenCheckCount - 1];
             checkButton.enabled = true;
+            timeDecreaseRate = Random.Range(decreaseRateRange.x, decreaseRateRange.y);
+            sleepGameState = SleepGameState.Dream;
         };
         
         Initialize();
         sleepGameState = SleepGameState.Dream;
         dream.SetActive(true);
+        checkButton.image.sprite = checkButtonSprites[currenCheckCount - 1];
+        timeDecreaseRate = Random.Range(decreaseRateRange.x, decreaseRateRange.y);
         checkButton.enabled = true;
     }
 
     public override void UpdatePhase()
     {
+        if (sleepGameState != SleepGameState.Dream) return;
+        
+        remainingTime -= timeDecreaseRate * Time.deltaTime;
+            
+        if (remainingTime <= 0)
+        {
+            RequestTransitionTo(GameState.Result);
+        }
+    }
+
+    private void Update()
+    {
+        if (sleepGameState != SleepGameState.Dream) return;
+        
+        remainingTime -= timeDecreaseRate * Time.deltaTime;
+            
+        if (remainingTime <= 0)
+        {
+            RequestTransitionTo(GameState.Result);
+        }
     }
 
     protected override void OnExitImpl()
@@ -97,8 +125,7 @@ public class SleepPhaseController : PhaseController
     
     private void ChangeState(SleepGameState newState)
     {
-        sleepGameState = newState;
-        switch (sleepGameState)
+        switch (newState)
         {
             case SleepGameState.Dream:
                 backSleepButton.enabled = false;
@@ -109,63 +136,10 @@ public class SleepPhaseController : PhaseController
                 dream.SetActive(false);
                 checkWatch.SetActive(true);
                 checkButton.enabled = false;
+                remainingTimeText.text = remainingTime.ConvertSec2Min().ToString();
+                currenCheckCount--;
+                sleepGameState = SleepGameState.CheckWatch;
                 break;
         }
-    }
-
-    /// <summary>
-    /// 時間チェックボタン処理
-    /// </summary>
-    public void OnCheckTime()
-    {
-        if (checkCount > 0)
-        {
-            checkCount--;
-            UpdateUI();
-            StartCoroutine(ShowTimerBriefly());
-            
-            if (checkCount <= 0 && checkButton != null)
-                checkButton.interactable = false;
-        }
-    }
-
-    /// <summary>
-    /// 起床ボタン処理
-    /// </summary>
-    public void OnWakeUp()
-    {
-        RequestTransitionTo(GameState.Run);
-    }
-
-    private void UpdateUI()
-    {
-        if (checkCountText != null)
-            checkCountText.text = $"{checkCount}";
-    }
-
-    private IEnumerator ShowTimerBriefly()
-    {
-        float elapsed = Time.time - phaseStartTime;
-        float currentRemaining = Mathf.Max(0, totalTime - elapsed);
-        
-        if (timerText != null)
-        {
-            timerText.text = currentRemaining.ToString("F2");
-            timerText.gameObject.SetActive(true);
-        }
-        
-        yield return new WaitForSeconds(timerDisplayDuration);
-        
-        if (timerText != null)
-            timerText.gameObject.SetActive(false);
-    }
-
-    /// <summary>
-    /// 残り時間を取得
-    /// </summary>
-    public float GetRemainingTime()
-    {
-        float elapsed = Time.time - phaseStartTime;
-        return Mathf.Max(0, totalTime - elapsed);
     }
 }
