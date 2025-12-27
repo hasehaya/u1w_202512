@@ -1,5 +1,10 @@
 ﻿using UnityEngine;
+using System.Collections.Generic;
 
+/// <summary>
+/// ゲーム全体の状態管理とフェーズ遷移を担当
+/// 責務: フェーズの切り替え、ゲームデータの管理、UIパネル管理
+/// </summary>
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
@@ -13,25 +18,47 @@ public class GameManager : MonoBehaviour
     [SerializeField] private RunPhaseController runController;
     [SerializeField] private ResultPhaseController resultController;
 
-    [Header("Managers")]
-    [SerializeField] private UIManager uiManager;
+    [Header("UI Panels")]
+    [SerializeField] private GameObject titlePanel;
+    [SerializeField] private GameObject loadingPanel;
+    [SerializeField] private GameObject prologuePanel;
+    [SerializeField] private GameObject tutorialPanel;
+    [SerializeField] private GameObject sleepPanel;
+    [SerializeField] private GameObject runPanel;
+    [SerializeField] private GameObject resultPanel;
 
     [Header("Game Settings")]
-    public float MinTime = 15f;
-    public float MaxTime = 25f;
+    [SerializeField] private float minTime = 15f;
+    [SerializeField] private float maxTime = 25f;
 
-    // Game Data
-    public float TotalTimeLimit { get; private set; }
-    public float StartTime { get; private set; }
-    public float SleepDuration { get; private set; } // 寝ていた時間
-    public float RemainingTime { get; private set; } // 残り時間
+    // ゲームデータ
+    private GameData gameData;
+    public GameData Data => gameData;
 
+    // フェーズ管理
     public GameState CurrentState { get; private set; }
     private PhaseController currentPhaseController;
+    private Dictionary<GameState, PhaseController> phaseControllers;
+    private Dictionary<GameState, GameObject> panelMap;
+
+    #region Unity Lifecycle
 
     private void Awake()
     {
-        if (Instance == null) Instance = this;
+        InitializeSingleton();
+        InitializeGameData();
+        InitializePhaseControllers();
+        InitializePanelMap();
+    }
+
+    private void OnEnable()
+    {
+        SubscribeToEvents();
+    }
+
+    private void OnDisable()
+    {
+        UnsubscribeFromEvents();
     }
 
     private void Start()
@@ -41,122 +68,208 @@ public class GameManager : MonoBehaviour
 
     private void Update()
     {
+        UpdateCurrentPhase();
+    }
+
+    #endregion
+
+    #region Initialization
+
+    private void InitializeSingleton()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
+
+    private void InitializeGameData()
+    {
+        gameData = new GameData
+        {
+            MinTime = minTime,
+            MaxTime = maxTime
+        };
+    }
+
+    private void InitializePhaseControllers()
+    {
+        phaseControllers = new Dictionary<GameState, PhaseController>
+        {
+            { GameState.Title, titleController },
+            { GameState.Loading, loadingController },
+            { GameState.Prologue, prologueController },
+            { GameState.Tutorial, tutorialController },
+            { GameState.Sleep, sleepController },
+            { GameState.Run, runController },
+            { GameState.Result, resultController }
+        };
+    }
+
+    private void InitializePanelMap()
+    {
+        panelMap = new Dictionary<GameState, GameObject>
+        {
+            { GameState.Title, titlePanel },
+            { GameState.Loading, loadingPanel },
+            { GameState.Prologue, prologuePanel },
+            { GameState.Tutorial, tutorialPanel },
+            { GameState.Sleep, sleepPanel },
+            { GameState.Run, runPanel },
+            { GameState.Result, resultPanel }
+        };
+    }
+
+    private void SubscribeToEvents()
+    {
+        PhaseEvents.OnPhaseTransitionRequested += ChangeState;
+        PhaseEvents.OnGameClearRequested += HandleGameClear;
+        PhaseEvents.OnGameOverRequested += HandleGameOver;
+    }
+
+    private void UnsubscribeFromEvents()
+    {
+        PhaseEvents.OnPhaseTransitionRequested -= ChangeState;
+        PhaseEvents.OnGameClearRequested -= HandleGameClear;
+        PhaseEvents.OnGameOverRequested -= HandleGameOver;
+    }
+
+    #endregion
+
+    #region Phase Management
+
+    private void UpdateCurrentPhase()
+    {
         if (currentPhaseController != null && currentPhaseController.IsActive)
         {
             currentPhaseController.UpdatePhase();
         }
     }
 
+    /// <summary>
+    /// ゲームステートを変更
+    /// </summary>
     public void ChangeState(GameState newState)
     {
-        // 現在のフェーズを終了
+        ExitCurrentPhase();
+
+        CurrentState = newState;
+
+        // UIパネルを切り替え
+        SwitchPanel(newState);
+
+        // フェーズ固有のデータ処理
+        ProcessPhaseData(newState);
+
+        // 新しいフェーズを開始
+        EnterNewPhase(newState);
+    }
+
+    private void ExitCurrentPhase()
+    {
         if (currentPhaseController != null)
         {
             currentPhaseController.OnPhaseExit();
         }
+    }
 
-        CurrentState = newState;
-        if (uiManager != null)
-            uiManager.SwitchPanel(newState);
-
-        switch (newState)
+    private void EnterNewPhase(GameState newState)
+    {
+        if (phaseControllers.TryGetValue(newState, out PhaseController controller))
         {
-            case GameState.Title:
-                currentPhaseController = titleController;
-                break;
-            case GameState.Loading:
-                currentPhaseController = loadingController;
-                break;
-            case GameState.Prologue:
-                currentPhaseController = prologueController;
-                break;
-            case GameState.Tutorial:
-                currentPhaseController = tutorialController;
-                break;
-            case GameState.Sleep:
-                currentPhaseController = sleepController;
-                StartSleepPhase();
-                break;
-            case GameState.Run:
-                currentPhaseController = runController;
-                StartRunPhase();
-                break;
-            case GameState.Result:
-                currentPhaseController = resultController;
-                resultController.DisplayResult(SleepDuration, RemainingTime, CalculateScore());
-                break;
+            currentPhaseController = controller;
+            currentPhaseController?.OnPhaseEnter();
         }
-
-        // 新しいフェーズを開始
-        if (currentPhaseController != null)
-        {
-            currentPhaseController.OnPhaseEnter();
-        }
-    }
-
-    private void StartSleepPhase()
-    {
-        TotalTimeLimit = Random.Range(MinTime, MaxTime);
-        StartTime = Time.time;
-        sleepController.Initialize(TotalTimeLimit);
-    }
-
-    private void StartRunPhase()
-    {
-        // 寝ていた時間を確定
-        SleepDuration = Time.time - StartTime;
-        
-        // 残り時間を計算 (もし寝過ごしていたら0)
-        float elapsed = Time.time - StartTime;
-        RemainingTime = Mathf.Max(0, TotalTimeLimit - elapsed);
-
-        if (RemainingTime <= 0)
-        {
-            // 即ゲームオーバー（または強制失敗のリザルトへ）
-            ChangeState(GameState.Result);
-            return;
-        }
-
-        runController.Initialize(RemainingTime);
-    }
-
-    public void GameClear(float finalRemainingTime)
-    {
-        RemainingTime = finalRemainingTime;
-        ChangeState(GameState.Result);
-    }
-
-    public void GameOver()
-    {
-        RemainingTime = 0;
-        ChangeState(GameState.Result);
-    }
-
-    private int CalculateScore()
-    {
-        if (RemainingTime <= 0) return 0;
-        return Mathf.FloorToInt((SleepDuration * 100) + (RemainingTime * 500));
     }
 
     /// <summary>
-    /// 現在のフェーズの一時停止
+    /// UIパネルを切り替え
+    /// </summary>
+    private void SwitchPanel(GameState state)
+    {
+        // すべてのパネルを非表示
+        foreach (var panel in panelMap.Values)
+        {
+            if (panel != null)
+                panel.SetActive(false);
+        }
+
+        // 対象のパネルのみ表示
+        if (panelMap.TryGetValue(state, out GameObject targetPanel) && targetPanel != null)
+        {
+            targetPanel.SetActive(true);
+        }
+    }
+
+    /// <summary>
+    /// フェーズ固有のデータ処理
+    /// </summary>
+    private void ProcessPhaseData(GameState newState)
+    {
+        switch (newState)
+        {
+            case GameState.Sleep:
+                gameData.StartSleep();
+                sleepController.SetTimeLimit(gameData.TotalTimeLimit);
+                break;
+
+            case GameState.Run:
+                gameData.EndSleep();
+                if (gameData.IsOverslept)
+                {
+                    // 寝過ごした場合は即リザルトへ
+                    gameData.SetGameOver();
+                    ChangeState(GameState.Result);
+                    return;
+                }
+                runController.SetRemainingTime(gameData.RemainingTime);
+                break;
+
+            case GameState.Result:
+                resultController.SetResultData(gameData.SleepDuration, gameData.RemainingTime, gameData.Score);
+                break;
+        }
+    }
+
+    #endregion
+
+    #region Game Events
+
+    private void HandleGameClear(float finalRemainingTime)
+    {
+        gameData.SetGameClear(finalRemainingTime);
+        ChangeState(GameState.Result);
+    }
+
+    private void HandleGameOver()
+    {
+        gameData.SetGameOver();
+        ChangeState(GameState.Result);
+    }
+
+    #endregion
+
+    #region Pause Control
+
+    /// <summary>
+    /// ゲームを一時停止
     /// </summary>
     public void PauseGame()
     {
-        if (currentPhaseController != null)
-        {
-            currentPhaseController.Pause();
-        }
+        currentPhaseController?.Pause();
     }
 
     /// <summary>
-    /// 現在のフェーズの再開
+    /// ゲームを再開
     /// </summary>
     public void ResumeGame()
     {
-        if (currentPhaseController != null)
-        {
-            currentPhaseController.Resume();
-        }
+        currentPhaseController?.Resume();
     }
+
+    #endregion
 }

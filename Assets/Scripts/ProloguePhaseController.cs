@@ -1,29 +1,29 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 
 /// <summary>
 /// プロローグフェーズコントローラー
-/// ゲームのストーリー導入部分
+/// 責務: ゲームのストーリー導入部分の管理
 /// </summary>
 public class ProloguePhaseController : PhaseController
 {
     [SerializeField] private float displayDuration = 5f;
+    [SerializeField] private Button skipButton;
+    
     private float displayTimer = 0f;
 
-    private void Start()
-    {
-        phaseType = GameState.Prologue;
-    }
+    public override GameState PhaseType => GameState.Prologue;
 
-    public override void Initialize()
+    protected override void OnEnterImpl()
     {
-        SetVisible(true);
         displayTimer = 0f;
+        
+        if (skipButton != null)
+            skipButton.onClick.AddListener(OnClickSkip);
     }
 
     public override void UpdatePhase()
     {
-        if (!IsActive) return;
-
         displayTimer += Time.deltaTime;
 
         if (displayTimer >= displayDuration)
@@ -32,24 +32,23 @@ public class ProloguePhaseController : PhaseController
         }
     }
 
-    public override void Cleanup()
+    protected override void OnExitImpl()
     {
-        SetVisible(false);
         displayTimer = 0f;
+        
+        if (skipButton != null)
+            skipButton.onClick.RemoveListener(OnClickSkip);
     }
 
-    /// <summary>
-    /// プロローグ完了時の処理
-    /// </summary>
     private void CompletePrologue()
     {
-        GameManager.Instance.ChangeState(GameState.Tutorial);
+        RequestTransitionTo(GameState.Tutorial);
     }
 
     /// <summary>
-    /// プロローグをスキップ
+    /// スキップボタンクリック時
     /// </summary>
-    public void SkipPrologue()
+    private void OnClickSkip()
     {
         CompletePrologue();
     }
