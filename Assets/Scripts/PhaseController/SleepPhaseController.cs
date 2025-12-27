@@ -91,7 +91,7 @@ public class SleepPhaseController : PhaseController
             
         if (remainingTime <= 0)
         {
-            RequestTransitionTo(GameState.Result);
+            RequestTransitionTo(GameState.GameOver);
         }
     }
 
@@ -103,7 +103,7 @@ public class SleepPhaseController : PhaseController
             
         if (remainingTime <= 0)
         {
-            RequestTransitionTo(GameState.Result);
+            RequestTransitionTo(GameState.GameOver);
         }
     }
 
