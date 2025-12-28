@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using TMPro;
 using System.Collections.Generic;
 using DG.Tweening;
+using Unity.VisualScripting;
 
 /// <summary>
 /// ラン（移動）フェーズコントローラー
@@ -110,7 +111,11 @@ public class RunPhaseController : PhaseController
             progressBar.value = 0;
 
         if (player != null)
+        {
+            player.Initialize();
             player.ResetPosition();
+        }
+            
 
         if (tapButton != null)
             tapButton.interactable = true;
@@ -120,6 +125,9 @@ public class RunPhaseController : PhaseController
 
     public override void UpdatePhase()
     {
+        if(player != null) 
+            player.UpdatePlayer();
+        
         // 遷移中はタイマーを停止
         if (!isTransitioning)
         {
@@ -138,6 +146,9 @@ public class RunPhaseController : PhaseController
 
     protected override void OnExitImpl()
     {
+        if(player != null)
+            player.OnExit();
+        
         progress = 0;
         obstacleTriggers.Clear();
         CancelInvoke();

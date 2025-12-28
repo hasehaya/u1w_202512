@@ -51,7 +51,7 @@ public class TutorialPhaseController : PhaseController
 
     private void CompleteTutorial()
     {
-        RequestTransitionTo(GameState.Sleep);
+        RequestTransitionTo(GameState.SetTimer);
     }
     
 }

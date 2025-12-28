@@ -25,6 +25,8 @@ public class SetTimerPhaseController : PhaseController
 
     protected override void OnEnterImpl()
     {
+        GameManager.Instance.Data.Reset();
+        goSleepText.text = "";
         
         slideSetController = slideSet.GetComponent<CheckWatchAnimationController>();
         alarmRingController = alarmRing.GetComponent<CheckWatchAnimationController>();
@@ -86,6 +88,7 @@ public class SetTimerPhaseController : PhaseController
         remainingTimeText.text = GameManager.Instance.Data.RemainingTime.ConvertSec2Min().ToString();
         slideSet.SetActive(false);
         alarmRing.SetActive(true);
+        AudioManager.Instance.PlaySe(SeType.Alarm);
     }
 
     private IEnumerator DelayExitAnimationStart()

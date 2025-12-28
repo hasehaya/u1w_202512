@@ -118,7 +118,7 @@ public class GameOverPhaseController : PhaseController
         {
             AudioManager.Instance.PlaySe(SeType.ButtonClick);
         }
-        RequestTransitionTo(GameState.Sleep);
+        RequestTransitionTo(GameState.SetTimer);
     }
 
     private void OnBackToTitle()

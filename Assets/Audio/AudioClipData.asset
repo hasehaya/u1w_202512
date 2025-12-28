@@ -15,19 +15,19 @@ MonoBehaviour:
   bgmClips:
   - bgmType: 1
     clip: {fileID: 8300000, guid: 985799c4253667f45acd40696e8b9a6f, type: 3}
-    volume: 0.7
+    volume: 0.6
     loop: 1
     fadeInDuration: 0
     fadeOutDuration: 0
   - bgmType: 5
     clip: {fileID: 8300000, guid: 9a843e94c30590341a3dd2f9e5f62fa6, type: 3}
-    volume: 0.7
+    volume: 0.6
     loop: 1
     fadeInDuration: 0
     fadeOutDuration: 0
   - bgmType: 2
     clip: {fileID: 8300000, guid: f20befae7bd9149438cbc0c3cb7ea2d6, type: 3}
-    volume: 0.7
+    volume: 0.6
     loop: 1
     fadeInDuration: 0
     fadeOutDuration: 0
@@ -48,7 +48,10 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: 04f387ebc0b55574f95276044b4cded7, type: 3}
     volume: 0.7
   - seType: 8
-    clip: {fileID: 8300000, guid: d53a1f122f913c047868b2ba1048f302, type: 3}
+    clip: {fileID: 8300000, guid: e224ea75763ee9242a5cc329fceea7a3, type: 3}
     volume: 0.7
+  - seType: 3
+    clip: {fileID: 8300000, guid: 99232a3da7e022049a257e0ea64545d3, type: 3}
+    volume: 0.8
   masterBGMVolume: 1
   masterSeVolume: 1

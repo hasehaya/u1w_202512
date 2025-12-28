@@ -44,26 +44,10 @@ public class Player : MonoBehaviour
 
     public PlayerPosition CurrentPosition => currentPosition;
 
-    private void Start()
+    public void UpdatePlayer()
     {
-        // 初期位置を中央に設定
-        if (rectTransform != null)
-        {
-            rectTransform.anchoredPosition = new Vector2(0f, centerPositionY);
-        }
-
-        // 初期スプライトを設定
-        if (playerImage != null && sprite1 != null)
-        {
-            playerImage.sprite = sprite1;
-            originalColor = playerImage.color;
-        }
-
-        SubscribeToInputEvents();
-    }
-
-    private void Update()
-    {
+        if(GameManager.Instance.CurrentState != GameState.Run) return;
+        
         // アイドルタイマーを更新
         idleTimer += Time.deltaTime;
 
@@ -93,8 +77,32 @@ public class Player : MonoBehaviour
             }
         }
     }
+    
+    public void Initialize()
+    {
+        // 初期位置を中央に設定
+        if (rectTransform != null)
+        {
+            rectTransform.anchoredPosition = new Vector2(0f, centerPositionY);
+        }
 
-    private void OnDestroy()
+        // 初期スプライトを設定
+        if (playerImage != null && sprite1 != null)
+        {
+            playerImage.sprite = sprite1;
+            originalColor = playerImage.color;
+        }
+
+        spriteChangeTimer = 0;
+        useFirstSprite = true;
+        autoReturnTimer = 0f;
+        shouldAutoReturn = false;
+        idleTimer = 0f;
+
+        SubscribeToInputEvents();
+    }
+
+    public void OnExit()
     {
         UnsubscribeFromInputEvents();
         moveTween?.Kill();

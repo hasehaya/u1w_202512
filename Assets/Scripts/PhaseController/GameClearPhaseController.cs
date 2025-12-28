@@ -19,6 +19,7 @@ public class GameClearPhaseController : PhaseController
     [SerializeField] private GameObject remainingTimeMinObject;
     [SerializeField] private TextMeshProUGUI awakeCountText;
     [SerializeField] private Button titleButton;
+    [SerializeField] private Button retryButton;
     [SerializeField] private CheckWatchAnimationController animationController;
     
     [Header("Rank Display")]
@@ -59,13 +60,26 @@ public class GameClearPhaseController : PhaseController
                 titleButton.enabled = true;
             };
         }
-            
+        
+        if (retryButton != null)
+        {
+            retryButton.onClick.AddListener(OnRetry);
+            retryButton.enabled = false;
+
+            animationController.OnEnterAnimationCompleted += () =>
+            {
+                retryButton.enabled = true;
+            };
+        }
     }
 
     private void CleanupButtons()
     {
         if (titleButton != null)
             titleButton.onClick.RemoveListener(OnBackToTitle);
+        
+        if (retryButton != null)
+            retryButton.onClick.RemoveListener(OnRetry);
         
         // eventに登録されたすべてのデリゲートをクリア
         if (animationController != null)
@@ -131,5 +145,14 @@ public class GameClearPhaseController : PhaseController
             AudioManager.Instance.PlaySe(SeType.ButtonClick);
         }
         RequestTransitionTo(GameState.Title);
+    }
+    
+    private void OnRetry()
+    {
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlaySe(SeType.ButtonClick);
+        }
+        RequestTransitionTo(GameState.SetTimer);
     }
 }

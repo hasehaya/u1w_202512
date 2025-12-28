@@ -53,7 +53,6 @@ public class SleepPhaseController : PhaseController
     protected override void OnEnterImpl()
     {
         remainingCheckCount = checkButtonSprites.Length;
-        GameManager.Instance.Data.Reset();
         gameData = GameManager.Instance.Data;
         initialRemainingTime = gameData.RemainingTime; // 寝る前の初期時間を記録
         
@@ -143,6 +142,7 @@ public class SleepPhaseController : PhaseController
         checkButton.enabled = false;
         wakeUpButton.enabled = false;
         backSleepButton.enabled = false;
+        backSleepButton.interactable = true;
         
         dream.SetActive(false);
         checkWatch.SetActive(false);
