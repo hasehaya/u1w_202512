@@ -4,6 +4,7 @@
     Loading,
     Prologue,
     Tutorial,
+    SetTimer,
     Sleep,
     Run,
     GameClear,

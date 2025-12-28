@@ -14,6 +14,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private LoadingPhaseController loadingController;
     [SerializeField] private ProloguePhaseController prologueController;
     [SerializeField] private TutorialPhaseController tutorialController;
+    [SerializeField] private SetTimerPhaseController setTimerController;
     [SerializeField] private SleepPhaseController sleepController;
     [SerializeField] private RunPhaseController runController;
     [SerializeField] private GameClearPhaseController gameClearController;
@@ -60,6 +61,7 @@ public class GameManager : MonoBehaviour
             { GameState.Loading, loadingController },
             { GameState.Prologue, prologueController },
             { GameState.Tutorial, tutorialController },
+            { GameState.SetTimer, setTimerController },
             { GameState.Sleep, sleepController },
             { GameState.Run, runController },
             { GameState.GameClear, gameClearController },
