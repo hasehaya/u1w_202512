@@ -706,6 +706,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: GameOver
       objectReference: {fileID: 0}
+    - target: {fileID: 1971890271497119001, guid: a1f67d97f56f2c94c8259e0ff8e32fdc, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4942864712374972419, guid: a1f67d97f56f2c94c8259e0ff8e32fdc, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
