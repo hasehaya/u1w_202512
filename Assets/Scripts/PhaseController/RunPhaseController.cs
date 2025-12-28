@@ -2,6 +2,7 @@
 using UnityEngine.UI;
 using TMPro;
 using System.Collections.Generic;
+using DG.Tweening;
 
 /// <summary>
 /// ラン（移動）フェーズコントローラー
@@ -20,6 +21,10 @@ public class RunPhaseController : PhaseController
     [Header("Obstacle")]
     [SerializeField] private ObstacleManager obstacleManager;
 
+    [Header("Fade")]
+    [SerializeField] private Image fadeImage;
+    [SerializeField] private float fadeDuration = 3f;
+
     [Header("Settings")]
     [SerializeField] private float requiredClicks;
     [SerializeField] private float safeTimeDuration;
@@ -33,6 +38,7 @@ public class RunPhaseController : PhaseController
     private bool isInSafeTime;
     private bool isInputLocked;
     private float inputLockTimer;
+    private bool isTransitioning;
 
     public override GameState PhaseType => GameState.Run;
 
@@ -88,7 +94,17 @@ public class RunPhaseController : PhaseController
         isInSafeTime = false;
         isInputLocked = false;
         inputLockTimer = 0f;
+        isTransitioning = false;
         progressIncrement = 1f / requiredClicks;
+
+        // フェードImageを透明にして非表示
+        if (fadeImage != null)
+        {
+            Color color = fadeImage.color;
+            color.a = 0f;
+            fadeImage.color = color;
+            fadeImage.gameObject.SetActive(false);
+        }
 
         if (progressBar != null)
             progressBar.value = 0;
@@ -104,15 +120,19 @@ public class RunPhaseController : PhaseController
 
     public override void UpdatePhase()
     {
-        GameManager.Instance.Data.RemainingTime -= Time.deltaTime;
+        // 遷移中はタイマーを停止
+        if (!isTransitioning)
+        {
+            GameManager.Instance.Data.RemainingTime -= Time.deltaTime;
+        }
         
         UpdateTimerUI();
         CheckCollision();
         UpdateInputLock();
 
-        if (GameManager.Instance.Data.RemainingTime <= 0)
+        if (!isTransitioning && GameManager.Instance.Data.RemainingTime <= 0)
         {
-            GameManager.Instance.RequestPhaseTransition(GameState.GameOver);
+            TransitionToGameOver();
         }
     }
 
@@ -126,7 +146,7 @@ public class RunPhaseController : PhaseController
 
     private void HandleTap()
     {
-        if (!IsActive || isInputLocked) return;
+        if (!IsActive || isInputLocked || isTransitioning) return;
 
         // プレイヤーの画像を切り替え
         if (player != null)
@@ -210,7 +230,7 @@ public class RunPhaseController : PhaseController
     {
         if (progress >= 1f)
         {
-            GameManager.Instance.RequestPhaseTransition(GameState.GameClear);
+            TransitionToGameClear();
         }
     }
 
@@ -323,6 +343,74 @@ public class RunPhaseController : PhaseController
                     tapButton.interactable = true;
                 }
             }
+        }
+    }
+
+    /// <summary>
+    /// ゲームクリア時のフェード付き遷移
+    /// </summary>
+    private void TransitionToGameClear()
+    {
+        if (isTransitioning) return;
+        
+        isTransitioning = true;
+        
+        // ボタンを無効化
+        if (tapButton != null)
+        {
+            tapButton.interactable = false;
+        }
+
+        // フェードアウトしてから遷移
+        if (fadeImage != null)
+        {
+            fadeImage.gameObject.SetActive(true);
+            Color color = fadeImage.color;
+            color.a = 0f;
+            fadeImage.color = color;
+            fadeImage.DOFade(1f, fadeDuration).OnComplete(() =>
+            {
+                GameManager.Instance.RequestPhaseTransition(GameState.GameClear);
+            });
+        }
+        else
+        {
+            // フェードImageが設定されていない場合は即座に遷移
+            GameManager.Instance.RequestPhaseTransition(GameState.GameClear);
+        }
+    }
+
+    /// <summary>
+    /// ゲームオーバー時のフェード付き遷移
+    /// </summary>
+    private void TransitionToGameOver()
+    {
+        if (isTransitioning) return;
+        
+        isTransitioning = true;
+        
+        // ボタンを無効化
+        if (tapButton != null)
+        {
+            tapButton.interactable = false;
+        }
+
+        // フェードアウトしてから遷移
+        if (fadeImage != null)
+        {
+            fadeImage.gameObject.SetActive(true);
+            Color color = fadeImage.color;
+            color.a = 0f;
+            fadeImage.color = color;
+            fadeImage.DOFade(1f, fadeDuration).OnComplete(() =>
+            {
+                GameManager.Instance.RequestPhaseTransition(GameState.GameOver);
+            });
+        }
+        else
+        {
+            // フェードImageが設定されていない場合は即座に遷移
+            GameManager.Instance.RequestPhaseTransition(GameState.GameOver);
         }
     }
 }
