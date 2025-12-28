@@ -14,9 +14,9 @@
     public string Rank()
     {
         int score = Score();
-        if (score >= 3000) return "S";
-        if (score >= 2500) return "A";
-        if (score >= 2000) return "B";
+        if (score >= 2700) return "S";
+        if (score >= 2300) return "A";
+        if (score >= 1800) return "B";
         return "C";
     }
     
