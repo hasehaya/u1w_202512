@@ -46,5 +46,7 @@ public enum SeType
     Attention = 4,
     Run = 5,
     Train = 6,
+    Gaba = 7,
+    Alarm = 8,
 }
 
