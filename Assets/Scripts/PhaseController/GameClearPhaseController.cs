@@ -102,6 +102,10 @@ public class GameClearPhaseController : PhaseController
 
     private void OnBackToTitle()
     {
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlaySe(SeType.ButtonClick);
+        }
         RequestTransitionTo(GameState.Title);
     }
 }

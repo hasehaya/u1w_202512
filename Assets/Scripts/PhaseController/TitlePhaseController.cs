@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+﻿﻿using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
@@ -13,6 +13,8 @@ public class TitlePhaseController : PhaseController
 
     protected override void OnEnterImpl()
     {
+        AudioManager.Instance.PlayBGM(BGMType.Title);
+        
         if (startButton != null)
             startButton.onClick.AddListener(OnClickStart);
     }
@@ -33,6 +35,11 @@ public class TitlePhaseController : PhaseController
     /// </summary>
     private void OnClickStart()
     {
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlaySe(SeType.ButtonClick);
+        }
+        
         RequestTransitionTo(GameState.Loading);
     }
 }

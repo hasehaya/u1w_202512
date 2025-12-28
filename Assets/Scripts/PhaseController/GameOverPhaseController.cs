@@ -114,11 +114,19 @@ public class GameOverPhaseController : PhaseController
 
     private void OnRetry()
     {
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlaySe(SeType.ButtonClick);
+        }
         RequestTransitionTo(GameState.Sleep);
     }
 
     private void OnBackToTitle()
     {
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlaySe(SeType.ButtonClick);
+        }
         RequestTransitionTo(GameState.Title);
     }
 }

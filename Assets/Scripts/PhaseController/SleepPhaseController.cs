@@ -56,10 +56,28 @@ public class SleepPhaseController : PhaseController
         
         checkWatchController = checkWatch.GetComponent<CheckWatchAnimationController>();
         wakeUpController = wakeUp.GetComponent<CheckWatchAnimationController>();
-        checkButton.onClick.AddListener(() => ChangeState(SleepGameState.CheckWatch));
-        wakeUpButton.onClick.AddListener(() => ChangeState(SleepGameState.WakeUp));
+        checkButton.onClick.AddListener(() =>
+        {
+            if (AudioManager.Instance != null)
+            {
+                AudioManager.Instance.PlaySe(SeType.ButtonClick);
+            }
+            ChangeState(SleepGameState.CheckWatch);
+        });
+        wakeUpButton.onClick.AddListener(() =>
+        {
+            if (AudioManager.Instance != null)
+            {
+                AudioManager.Instance.PlaySe(SeType.ButtonClick);
+            }
+            ChangeState(SleepGameState.WakeUp);
+        });
         backSleepButton.onClick.AddListener(() =>
         {
+            if (AudioManager.Instance != null)
+            {
+                AudioManager.Instance.PlaySe(SeType.ButtonClick);
+            }
             ChangeState(SleepGameState.Dream);
         });
 

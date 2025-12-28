@@ -148,6 +148,12 @@ public class RunPhaseController : PhaseController
     {
         if (!IsActive || isInputLocked || isTransitioning) return;
 
+        // ランニングSEを再生
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlaySe(SeType.Run);
+        }
+
         // プレイヤーの画像を切り替え
         if (player != null)
         {
@@ -294,6 +300,12 @@ public class RunPhaseController : PhaseController
     /// </summary>
     private void HandleCollision()
     {
+        // 衝突SEを再生
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlaySe(SeType.Collision);
+        }
+        
         // 入力をロック
         isInputLocked = true;
         inputLockTimer = collisionPenaltyDuration;
@@ -355,6 +367,11 @@ public class RunPhaseController : PhaseController
         
         isTransitioning = true;
         
+        // 緊急状態の注意SEを再生
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlaySe(SeType.Attention);
+        }
         // ボタンを無効化
         if (tapButton != null)
         {
@@ -389,6 +406,11 @@ public class RunPhaseController : PhaseController
         
         isTransitioning = true;
         
+        // 緊急状態の注意SEを再生
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlaySe(SeType.Attention);
+        }
         // ボタンを無効化
         if (tapButton != null)
         {
