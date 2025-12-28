@@ -10,6 +10,15 @@
         return 1000 + (int)RemainingTime * 2 - CheckCount * 300;
     }
     
+    public string Rank()
+    {
+        int score = Score();
+        if (score >= 3000) return "S";
+        if (score >= 2500) return "A";
+        if (score >= 2000) return "B";
+        return "C";
+    }
+    
     public void Reset()
     {
         CheckCount = 0;

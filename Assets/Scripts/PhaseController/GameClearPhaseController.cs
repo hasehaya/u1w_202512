@@ -20,6 +20,13 @@ public class GameClearPhaseController : PhaseController
     [SerializeField] private TextMeshProUGUI awakeCountText;
     [SerializeField] private Button titleButton;
     [SerializeField] private CheckWatchAnimationController animationController;
+    
+    [Header("Rank Display")]
+    [SerializeField] private Image rankImage;
+    [SerializeField] private Sprite rankSSprite;
+    [SerializeField] private Sprite rankASprite;
+    [SerializeField] private Sprite rankBSprite;
+    [SerializeField] private Sprite rankCSprite;
 
     public override GameState PhaseType => GameState.GameClear;
 
@@ -98,6 +105,23 @@ public class GameClearPhaseController : PhaseController
         
         if (awakeCountText != null)
             awakeCountText.text = $"{GameManager.Instance.Data.CheckCount}";
+        
+        // ランク表示
+        if (rankImage != null)
+        {
+            string rank = GameManager.Instance.Data.Rank();
+            Sprite rankSprite = rank switch
+            {
+                "S" => rankSSprite,
+                "A" => rankASprite,
+                "B" => rankBSprite,
+                "C" => rankCSprite,
+                _ => rankCSprite
+            };
+            
+            if (rankSprite != null)
+                rankImage.sprite = rankSprite;
+        }
     }
 
     private void OnBackToTitle()
