@@ -487,6 +487,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Run
       objectReference: {fileID: 0}
+    - target: {fileID: 6328220173131608120, guid: 3b0a458aeabf0334db48885202e38203, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8821599440454683285, guid: 3b0a458aeabf0334db48885202e38203, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -599,6 +603,10 @@ PrefabInstance:
     - target: {fileID: 1971890271497119001, guid: a1f67d97f56f2c94c8259e0ff8e32fdc, type: 3}
       propertyPath: m_Name
       value: GameOver
+      objectReference: {fileID: 0}
+    - target: {fileID: 1971890271497119001, guid: a1f67d97f56f2c94c8259e0ff8e32fdc, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4942864712374972419, guid: a1f67d97f56f2c94c8259e0ff8e32fdc, type: 3}
       propertyPath: m_Pivot.x
@@ -1319,6 +1327,42 @@ PrefabInstance:
       propertyPath: m_Name
       value: GameClear
       objectReference: {fileID: 0}
+    - target: {fileID: 7207117147969581487, guid: 178063a99bc1ab642bb5afeae5a93451, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8534548190783609521, guid: 178063a99bc1ab642bb5afeae5a93451, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8534548190783609521, guid: 178063a99bc1ab642bb5afeae5a93451, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8534548190783609521, guid: 178063a99bc1ab642bb5afeae5a93451, type: 3}
+      propertyPath: m_AnchorMin.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8534548190783609521, guid: 178063a99bc1ab642bb5afeae5a93451, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8534548190783609521, guid: 178063a99bc1ab642bb5afeae5a93451, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8534548190783609521, guid: 178063a99bc1ab642bb5afeae5a93451, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8534548190783609521, guid: 178063a99bc1ab642bb5afeae5a93451, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8534548190783609521, guid: 178063a99bc1ab642bb5afeae5a93451, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1345,6 +1389,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4818549200930779999}
   - component: {fileID: 7035856010134355759}
+  - component: {fileID: 7730128550068338346}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -1352,6 +1397,19 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!114 &7730128550068338346
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7730128550068338345}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 518ffffffd75df04aa07fbbbca56b973, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TestBackSleep
+  startState: 6
 --- !u!1001 &7849994769372343941
 PrefabInstance:
   m_ObjectHideFlags: 0

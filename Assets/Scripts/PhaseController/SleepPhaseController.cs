@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 using Random = UnityEngine.Random;
@@ -17,22 +17,24 @@ public class SleepPhaseController : PhaseController
 
     [SerializeField] private GameObject dream;
     [SerializeField] private GameObject checkWatch;
+    [SerializeField] private GameObject wakeUp;
 
     [SerializeField] private Sprite[] checkButtonSprites;
+    [SerializeField] private GameObject[] popUpStates;
 
     [Header("Settings")]
     [SerializeField] private Vector2 decreaseRateRange = new Vector2(3f, 10f);
     [SerializeField] private Vector2 popUpStateThreshold = new Vector2(300f, 100f);
-
-    private int maxCheckCount;
-    private int currenCheckCount;
+    [SerializeField] private float transitionDurationToRunPhase = 2.0f;
+    
+    private int remainingCheckCount;
     
     private float timeDecreaseRate = 1.0f;
     
-    // 
-    private float remainingTime = 600.0f;
+    private GameData gameData;
     
     private CheckWatchAnimationController checkWatchController;
+    private CheckWatchAnimationController wakeUpController;
 
     public override GameState PhaseType => GameState.Sleep;
     
@@ -42,16 +44,19 @@ public class SleepPhaseController : PhaseController
     private enum SleepGameState
     {
         Dream,
-        CheckWatch
+        CheckWatch,
+        WakeUp
     }
 
     protected override void OnEnterImpl()
     {
-        currenCheckCount = checkButtonSprites.Length;
+        remainingCheckCount = checkButtonSprites.Length;
+        gameData = GameManager.Instance.Data;
         
         checkWatchController = checkWatch.GetComponent<CheckWatchAnimationController>();
+        wakeUpController = wakeUp.GetComponent<CheckWatchAnimationController>();
         checkButton.onClick.AddListener(() => ChangeState(SleepGameState.CheckWatch));
-        wakeUpButton.onClick.AddListener(() => RequestTransitionTo(GameState.Run));
+        wakeUpButton.onClick.AddListener(() => ChangeState(SleepGameState.WakeUp));
         backSleepButton.onClick.AddListener(() =>
         {
             ChangeState(SleepGameState.Dream);
@@ -62,23 +67,28 @@ public class SleepPhaseController : PhaseController
             wakeUpButton.enabled = true;
             backSleepButton.enabled = true;
             
-            if(currenCheckCount == 0)
+            if(remainingCheckCount == 0)
                 backSleepButton.interactable = false;
         };
         checkWatchController.OnExitAnimationComplete += () =>
         {
             checkWatch.SetActive(false);
             dream.SetActive(true);
-            checkButton.image.sprite = checkButtonSprites[currenCheckCount - 1];
+            checkButton.image.sprite = checkButtonSprites[remainingCheckCount - 1];
             checkButton.enabled = true;
             timeDecreaseRate = Random.Range(decreaseRateRange.x, decreaseRateRange.y);
             sleepGameState = SleepGameState.Dream;
         };
+        wakeUpController.OnEnterAnimationComplete += () =>
+        {
+            StartCoroutine(TransitionToRun());
+        };
+        
         
         Initialize();
         sleepGameState = SleepGameState.Dream;
         dream.SetActive(true);
-        checkButton.image.sprite = checkButtonSprites[currenCheckCount - 1];
+        checkButton.image.sprite = checkButtonSprites[remainingCheckCount - 1];
         timeDecreaseRate = Random.Range(decreaseRateRange.x, decreaseRateRange.y);
         checkButton.enabled = true;
     }
@@ -87,21 +97,9 @@ public class SleepPhaseController : PhaseController
     {
         if (sleepGameState != SleepGameState.Dream) return;
         
-        remainingTime -= timeDecreaseRate * Time.deltaTime;
+        gameData.RemainingTime -= timeDecreaseRate * Time.deltaTime;
             
-        if (remainingTime <= 0)
-        {
-            RequestTransitionTo(GameState.GameOver);
-        }
-    }
-
-    private void Update()
-    {
-        if (sleepGameState != SleepGameState.Dream) return;
-        
-        remainingTime -= timeDecreaseRate * Time.deltaTime;
-            
-        if (remainingTime <= 0)
+        if (gameData.RemainingTime <= 0)
         {
             RequestTransitionTo(GameState.GameOver);
         }
@@ -121,6 +119,7 @@ public class SleepPhaseController : PhaseController
         
         dream.SetActive(false);
         checkWatch.SetActive(false);
+        wakeUp.SetActive(false);
     }
     
     private void ChangeState(SleepGameState newState)
@@ -136,10 +135,45 @@ public class SleepPhaseController : PhaseController
                 dream.SetActive(false);
                 checkWatch.SetActive(true);
                 checkButton.enabled = false;
-                remainingTimeText.text = remainingTime.ConvertSec2Min().ToString();
-                currenCheckCount--;
+                remainingTimeText.text = gameData.RemainingTime.ConvertSec2Min().ToString();
+                remainingCheckCount--;
+                gameData.CheckCount++;
+                SetPopUpState(gameData.RemainingTime, remainingCheckCount == 0);
+                
                 sleepGameState = SleepGameState.CheckWatch;
                 break;
+            case SleepGameState.WakeUp:
+                wakeUp.SetActive(true);
+                sleepGameState = SleepGameState.WakeUp;
+                break;
         }
+    }
+    
+    private void SetPopUpState(float time, bool forceHighState = false)
+    {
+        if(time <= popUpStateThreshold.y || forceHighState)
+        {
+            popUpStates[0].SetActive(false);
+            popUpStates[1].SetActive(false);
+            popUpStates[2].SetActive(true);
+        }
+        else if(time <= popUpStateThreshold.x)
+        {
+            popUpStates[0].SetActive(false);
+            popUpStates[1].SetActive(true);
+            popUpStates[2].SetActive(false);
+        }
+        else
+        {
+            popUpStates[0].SetActive(true);
+            popUpStates[1].SetActive(false);
+            popUpStates[2].SetActive(false);
+        }
+    }
+
+    private IEnumerator TransitionToRun()
+    {
+        yield return new WaitForSeconds(transitionDurationToRunPhase);
+        RequestTransitionTo(GameState.Run);
     }
 }
