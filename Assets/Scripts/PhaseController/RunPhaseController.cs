@@ -123,7 +123,7 @@ public class RunPhaseController : PhaseController
         // 遷移中はタイマーを停止
         if (!isTransitioning)
         {
-            GameManager.Instance.Data.RemainingTime -= Time.deltaTime;
+            GameManager.Instance.Data.RemainingTime -= 60 * Time.deltaTime;
         }
         
         UpdateTimerUI();
@@ -147,6 +147,12 @@ public class RunPhaseController : PhaseController
     private void HandleTap()
     {
         if (!IsActive || isInputLocked || isTransitioning) return;
+
+        // ランニングSEを再生
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlaySe(SeType.Run);
+        }
 
         // プレイヤーの画像を切り替え
         if (player != null)
@@ -286,7 +292,7 @@ public class RunPhaseController : PhaseController
     private void UpdateTimerUI()
     {
         if (timerText != null)
-            timerText.text = Mathf.Max(0, GameManager.Instance.Data.RemainingTime).ToString("F2");
+            timerText.text = Mathf.Max(0, (int)GameManager.Instance.Data.RemainingTime / 60).ToString();
     }
 
     /// <summary>
@@ -294,6 +300,12 @@ public class RunPhaseController : PhaseController
     /// </summary>
     private void HandleCollision()
     {
+        // 衝突SEを再生
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlaySe(SeType.Collision);
+        }
+        
         // 入力をロック
         isInputLocked = true;
         inputLockTimer = collisionPenaltyDuration;
@@ -355,6 +367,10 @@ public class RunPhaseController : PhaseController
         
         isTransitioning = true;
         
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlaySe(SeType.Train);
+        }
         // ボタンを無効化
         if (tapButton != null)
         {
@@ -389,6 +405,10 @@ public class RunPhaseController : PhaseController
         
         isTransitioning = true;
         
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlaySe(SeType.Train);
+        }
         // ボタンを無効化
         if (tapButton != null)
         {

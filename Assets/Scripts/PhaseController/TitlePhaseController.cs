@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+﻿﻿using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
@@ -13,27 +13,37 @@ public class TitlePhaseController : PhaseController
 
     protected override void OnEnterImpl()
     {
+        AudioManager.Instance.PlayBGM(BGMType.Title);
+        
         if (startButton != null)
-            startButton.onClick.AddListener(OnClickStart);
+        {
+            startButton.onClick.AddListener(GameStart);
+        }
     }
 
     public override void UpdatePhase()
     {
-        // タイトル画面での更新処理
+     
     }
 
     protected override void OnExitImpl()
     {
         if (startButton != null)
-            startButton.onClick.RemoveListener(OnClickStart);
+        {
+            startButton.onClick.RemoveListener(GameStart);
+        }
     }
-
+    
     /// <summary>
     /// スタートボタンクリック時
     /// </summary>
-    private void OnClickStart()
+    private void GameStart()
     {
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlaySe(SeType.ButtonClick);
+        }
+        
         RequestTransitionTo(GameState.Loading);
     }
 }
-

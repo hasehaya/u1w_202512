@@ -119,6 +119,12 @@ public class Player : MonoBehaviour
 
     private void HandleSwipe(SwipeDirection direction)
     {
+        // スワイプSEを再生
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlaySe(SeType.Swipe);
+        }
+        
         switch (direction)
         {
             case SwipeDirection.Left:
