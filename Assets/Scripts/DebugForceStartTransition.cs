@@ -2,9 +2,9 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class TestBackSleep : MonoBehaviour
+public class DebugForceStartTransition : MonoBehaviour
 {
-    [SerializeField] private SleepPhaseController sleepPhaseController;
+    [SerializeField] private GameState startState;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -14,6 +14,6 @@ public class TestBackSleep : MonoBehaviour
     private IEnumerator DelayStart()
     {
         yield return new WaitForSeconds(0.5f);
-        GameManager.Instance.RequestPhaseTransition(GameState.Sleep);
+        GameManager.Instance.RequestPhaseTransition(startState);
     }
 }
