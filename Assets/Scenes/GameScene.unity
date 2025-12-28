@@ -707,10 +707,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: Run
       objectReference: {fileID: 0}
-    - target: {fileID: 6328220173131608120, guid: 3b0a458aeabf0334db48885202e38203, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 8821599440454683285, guid: 3b0a458aeabf0334db48885202e38203, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -790,14 +786,6 @@ PrefabInstance:
     - target: {fileID: 8821599440454683285, guid: 3b0a458aeabf0334db48885202e38203, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 9045238669909574368, guid: 3b0a458aeabf0334db48885202e38203, type: 3}
-      propertyPath: m_AnchorMax.x
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 9045238669909574368, guid: 3b0a458aeabf0334db48885202e38203, type: 3}
-      propertyPath: m_AnchorMax.y
-      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
