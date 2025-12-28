@@ -71,5 +71,8 @@ MonoBehaviour:
   - seType: 4
     clip: {fileID: 8300000, guid: 5ae3de0e872097943b56e9f7b618802f, type: 3}
     volume: 0.2
+  - seType: 10
+    clip: {fileID: 8300000, guid: 4e8bbef89c2601b40826d89a56c1d980, type: 3}
+    volume: 0.827
   masterBGMVolume: 1
   masterSeVolume: 1
