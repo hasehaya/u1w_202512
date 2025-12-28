@@ -21,6 +21,7 @@ public class ProloguePhaseController : PhaseController
 
     protected override void OnEnterImpl()
     {
+        AudioManager.Instance.PlayBGM(BGMType.Prologue);
         InputManager.Instance.OnTap += OnScreenTapped;
         StartPrologue();
     }

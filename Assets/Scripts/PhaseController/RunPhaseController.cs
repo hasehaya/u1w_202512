@@ -367,10 +367,9 @@ public class RunPhaseController : PhaseController
         
         isTransitioning = true;
         
-        // 緊急状態の注意SEを再生
         if (AudioManager.Instance != null)
         {
-            AudioManager.Instance.PlaySe(SeType.Attention);
+            AudioManager.Instance.PlaySe(SeType.Train);
         }
         // ボタンを無効化
         if (tapButton != null)
@@ -406,10 +405,9 @@ public class RunPhaseController : PhaseController
         
         isTransitioning = true;
         
-        // 緊急状態の注意SEを再生
         if (AudioManager.Instance != null)
         {
-            AudioManager.Instance.PlaySe(SeType.Attention);
+            AudioManager.Instance.PlaySe(SeType.Train);
         }
         // ボタンを無効化
         if (tapButton != null)

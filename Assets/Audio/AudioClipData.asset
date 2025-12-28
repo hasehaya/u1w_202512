@@ -44,9 +44,6 @@ MonoBehaviour:
   - seType: 6
     clip: {fileID: 8300000, guid: e5cb498ce510a5d49bda18f6c8ee03f8, type: 3}
     volume: 0.7
-  - seType: 6
-    clip: {fileID: 8300000, guid: e5cb498ce510a5d49bda18f6c8ee03f8, type: 3}
-    volume: 0.7
   - seType: 7
     clip: {fileID: 8300000, guid: 04f387ebc0b55574f95276044b4cded7, type: 3}
     volume: 0.7
