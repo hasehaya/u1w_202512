@@ -33,11 +33,6 @@ public class TitlePhaseController : PhaseController
             startButton.onClick.RemoveListener(GameStart);
         }
     }
-
-    private void OnScreenTapped()
-    {
-        GameStart();
-    }
     
     /// <summary>
     /// スタートボタンクリック時
