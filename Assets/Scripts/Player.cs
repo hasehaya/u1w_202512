@@ -107,6 +107,12 @@ public class Player : MonoBehaviour
         UnsubscribeFromInputEvents();
         moveTween?.Kill();
         blinkTween?.Kill();
+        
+        // 色を元に戻す
+        if (playerImage != null)
+        {
+            playerImage.color = originalColor;
+        }
     }
 
     private void SubscribeToInputEvents()
