@@ -51,6 +51,7 @@ public class SleepPhaseController : PhaseController
     protected override void OnEnterImpl()
     {
         remainingCheckCount = checkButtonSprites.Length;
+        GameManager.Instance.Data.Reset();
         gameData = GameManager.Instance.Data;
         
         checkWatchController = checkWatch.GetComponent<CheckWatchAnimationController>();
