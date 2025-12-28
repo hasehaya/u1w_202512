@@ -118,6 +118,7 @@
     "m_OutputNode": {
         "m_Id": "71426e6d860a4e708e5c9916c8198e43"
     },
+    "m_SubDatas": [],
     "m_ActiveTargets": []
 }
 
@@ -228,6 +229,7 @@
     "m_SourceType": 0,
     "m_FunctionName": "SoftMaskForGraph",
     "m_FunctionSource": "c0f7e0d8262ac42cc9ec30a5aea12d72",
+    "m_FunctionSourceUsePragmas": true,
     "m_FunctionBody": "Enter function body here..."
 }
 
@@ -305,10 +307,10 @@
         "m_Expanded": true,
         "m_Position": {
             "serializedVersion": "2",
-            "x": 151.0,
-            "y": -71.0,
-            "width": 86.0,
-            "height": 77.0
+            "x": 169.00001525878907,
+            "y": -47.999996185302737,
+            "width": 86.00003051757813,
+            "height": 76.99999237060547
         }
     },
     "m_Slots": [
@@ -364,7 +366,8 @@
     "m_StageCapability": 3,
     "m_Value": 0.0,
     "m_DefaultValue": 0.0,
-    "m_Labels": []
+    "m_Labels": [],
+    "m_LiteralMode": false
 }
 
 {
@@ -402,7 +405,8 @@
     "m_StageCapability": 3,
     "m_Value": 0.0,
     "m_DefaultValue": 0.0,
-    "m_Labels": []
+    "m_Labels": [],
+    "m_LiteralMode": false
 }
 
 {
@@ -463,7 +467,8 @@
     "m_StageCapability": 3,
     "m_Value": 0.0,
     "m_DefaultValue": 0.0,
-    "m_Labels": []
+    "m_Labels": [],
+    "m_LiteralMode": false
 }
 
 {
@@ -473,6 +478,9 @@
     "m_Guid": {
         "m_GuidSerialized": "5168bda3-4eaf-4209-9dae-15e8eb3a37c6"
     },
+    "promotedFromAssetID": "",
+    "promotedFromCategoryName": "",
+    "promotedOrdering": -1,
     "m_Name": "Alpha",
     "m_DefaultRefNameVersion": 1,
     "m_RefNameGeneratedByDisplayName": "Alpha",
@@ -486,12 +494,25 @@
     "overrideHLSLDeclaration": false,
     "hlslDeclarationOverride": 0,
     "m_Hidden": false,
+    "m_PerRendererData": false,
+    "m_customAttributes": [],
     "m_Value": 1.0,
     "m_FloatType": 0,
+    "m_LiteralFloatMode": false,
     "m_RangeValues": {
         "x": 0.0,
         "y": 1.0
-    }
+    },
+    "m_SliderType": 0,
+    "m_SliderPower": 3.0,
+    "m_EnumType": 0,
+    "m_CSharpEnumString": "",
+    "m_EnumNames": [
+        "Default"
+    ],
+    "m_EnumValues": [
+        0
+    ]
 }
 
 {
@@ -506,6 +527,7 @@
     "m_StageCapability": 3,
     "m_Value": 0.0,
     "m_DefaultValue": 0.0,
-    "m_Labels": []
+    "m_Labels": [],
+    "m_LiteralMode": false
 }
 

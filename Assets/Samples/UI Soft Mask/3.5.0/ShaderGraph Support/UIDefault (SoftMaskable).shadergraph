@@ -144,6 +144,7 @@
     "m_OutputNode": {
         "m_Id": ""
     },
+    "m_SubDatas": [],
     "m_ActiveTargets": [
         {
             "m_Id": "cffbf08685be4c00a2c673c2a9170fe3"
@@ -172,7 +173,8 @@
     "m_StageCapability": 3,
     "m_Value": 0.0,
     "m_DefaultValue": 0.0,
-    "m_Labels": []
+    "m_Labels": [],
+    "m_LiteralMode": false
 }
 
 {
@@ -251,7 +253,8 @@
     "m_StageCapability": 2,
     "m_Value": 0.0,
     "m_DefaultValue": 0.0,
-    "m_Labels": []
+    "m_Labels": [],
+    "m_LiteralMode": false
 }
 
 {
@@ -261,6 +264,9 @@
     "m_Guid": {
         "m_GuidSerialized": "5013ef1d-5651-49d4-8402-1d996026da38"
     },
+    "promotedFromAssetID": "",
+    "promotedFromCategoryName": "",
+    "promotedOrdering": -1,
     "m_Name": "SOFTMASK_EDITOR",
     "m_DefaultRefNameVersion": 1,
     "m_RefNameGeneratedByDisplayName": "SOFTMASK_EDITOR",
@@ -291,7 +297,8 @@
     "m_StageCapability": 2,
     "m_Value": 0.009999999776482582,
     "m_DefaultValue": 0.5,
-    "m_Labels": []
+    "m_Labels": [],
+    "m_LiteralMode": false
 }
 
 {
@@ -301,7 +308,7 @@
     "m_Group": {
         "m_Id": ""
     },
-    "m_Name": "SoftMask",
+    "m_Name": "Soft Mask",
     "m_DrawState": {
         "m_Expanded": true,
         "m_Position": {
@@ -346,6 +353,9 @@
     "m_Guid": {
         "m_GuidSerialized": "2822e895-eb67-4e6f-9e2c-7cf3acdc1b93"
     },
+    "promotedFromAssetID": "",
+    "promotedFromCategoryName": "",
+    "promotedOrdering": -1,
     "m_Name": "_MainTex",
     "m_DefaultRefNameVersion": 1,
     "m_RefNameGeneratedByDisplayName": "_MainTex",
@@ -359,12 +369,15 @@
     "overrideHLSLDeclaration": false,
     "hlslDeclarationOverride": 0,
     "m_Hidden": false,
+    "m_PerRendererData": false,
+    "m_customAttributes": [],
     "m_Value": {
-        "m_SerializedTexture": "{\"texture\":{\"instanceID\":0}}",
+        "m_SerializedTexture": "",
         "m_Guid": ""
     },
     "isMainTexture": false,
     "useTilingAndOffset": false,
+    "useTexelSize": true,
     "m_Modifiable": true,
     "m_DefaultType": 0
 }
@@ -394,10 +407,10 @@
         "m_Expanded": true,
         "m_Position": {
             "serializedVersion": "2",
-            "x": -660.0,
-            "y": 123.0000228881836,
+            "x": -657.0000610351563,
+            "y": 106.00001525878906,
             "width": 132.0,
-            "height": 33.999977111816409
+            "height": 33.99998474121094
         }
     },
     "m_Slots": [
@@ -485,7 +498,17 @@
     "m_StageCapability": 2,
     "m_Value": 0.0,
     "m_DefaultValue": 0.0,
-    "m_Labels": []
+    "m_Labels": [],
+    "m_LiteralMode": false
+}
+
+{
+    "m_SGVersion": 0,
+    "m_Type": "UnityEditor.Rendering.Canvas.ShaderGraph.CanvasData",
+    "m_ObjectId": "6f5e9e5bb5a247aabfe75b87e9c2477a",
+    "m_Version": 0,
+    "m_AlphaClip": false,
+    "m_DisableTint": false
 }
 
 {
@@ -500,7 +523,8 @@
     "m_StageCapability": 2,
     "m_Value": 0.0,
     "m_DefaultValue": 0.0,
-    "m_Labels": []
+    "m_Labels": [],
+    "m_LiteralMode": false
 }
 
 {
@@ -510,6 +534,9 @@
     "m_Guid": {
         "m_GuidSerialized": "9c2d1134-da74-4aa1-9421-b4f51c3db638"
     },
+    "promotedFromAssetID": "",
+    "promotedFromCategoryName": "",
+    "promotedOrdering": -1,
     "m_Name": "SOFTMASKABLE",
     "m_DefaultRefNameVersion": 1,
     "m_RefNameGeneratedByDisplayName": "SOFTMASKABLE",
@@ -589,6 +616,8 @@
     "m_AlphaClip": false,
     "m_CastShadows": true,
     "m_ReceiveShadows": true,
+    "m_DisableTint": false,
+    "m_Sort3DAs2DCompatible": false,
     "m_AdditionalMotionVectorMode": 0,
     "m_AlembicMotionVectors": false,
     "m_SupportsLODCrossFade": false,
@@ -626,7 +655,8 @@
     "m_StageCapability": 2,
     "m_Value": 1.0,
     "m_DefaultValue": 1.0,
-    "m_Labels": []
+    "m_Labels": [],
+    "m_LiteralMode": false
 }
 
 {
@@ -675,7 +705,7 @@
     "m_StageCapability": 3,
     "m_BareResource": false,
     "m_Texture": {
-        "m_SerializedTexture": "{\"texture\":{\"instanceID\":0}}",
+        "m_SerializedTexture": "",
         "m_Guid": ""
     },
     "m_DefaultType": 0
@@ -715,7 +745,8 @@
     "m_StageCapability": 2,
     "m_Value": 0.0,
     "m_DefaultValue": 0.0,
-    "m_Labels": []
+    "m_Labels": [],
+    "m_LiteralMode": false
 }
 
 {
@@ -756,6 +787,11 @@
     "m_SGVersion": 2,
     "m_Type": "UnityEditor.Rendering.BuiltIn.ShaderGraph.BuiltInTarget",
     "m_ObjectId": "cffbf08685be4c00a2c673c2a9170fe3",
+    "m_Datas": [
+        {
+            "m_Id": "6f5e9e5bb5a247aabfe75b87e9c2477a"
+        }
+    ],
     "m_ActiveSubTarget": {
         "m_Id": "892d917161c546dfa43e51ff7bd5bf12"
     },
@@ -834,7 +870,8 @@
     "m_Type": "UnityEditor.Rendering.Canvas.ShaderGraph.CanvasData",
     "m_ObjectId": "f618f11cb24a4ad69001da72b6f0348c",
     "m_Version": 0,
-    "m_AlphaClip": true
+    "m_AlphaClip": true,
+    "m_DisableTint": false
 }
 
 {
@@ -849,7 +886,8 @@
     "m_StageCapability": 3,
     "m_Value": 1.0,
     "m_DefaultValue": 0.0,
-    "m_Labels": []
+    "m_Labels": [],
+    "m_LiteralMode": false
 }
 
 {
