@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
@@ -7,86 +8,42 @@ using UnityEngine.UI;
 /// </summary>
 public class TutorialPhaseController : PhaseController
 {
-    [SerializeField] private int tutorialStageCount = 3;
-    [SerializeField] private Button nextButton;
-    [SerializeField] private Button skipButton;
-    [SerializeField] private Button startGameButton;
-    
-    private int currentStage = 0;
+    [SerializeField] private Sprite[] tutorialImages;
+    [SerializeField] private Sprite[] playImages;
+    [SerializeField] private Image tutorialImage;
+    [SerializeField] private Image playImage;
+    private int currentIndex;
 
     public override GameState PhaseType => GameState.Tutorial;
 
     protected override void OnEnterImpl()
-    {
-        currentStage = 0;
-        SetupButtons();
-        // デバッグ用
-        RequestTransitionTo(GameState.Sleep);
+    {   
+        InputManager.Instance.OnTap += OnScreenTapped;
+        currentIndex = 0;
+        tutorialImage.sprite = tutorialImages[currentIndex];
+        playImage.sprite = playImages[currentIndex];
     }
 
     public override void UpdatePhase()
     {
-        // チュートリアルの更新ロジック（必要に応じて実装）
+        
     }
 
     protected override void OnExitImpl()
     {
-        currentStage = 0;
-        CleanupButtons();
+        InputManager.Instance.OnTap -= OnScreenTapped;
     }
 
-    private void SetupButtons()
+    private void OnScreenTapped()
     {
-        if (nextButton != null)
-            nextButton.onClick.AddListener(OnClickNext);
-        if (skipButton != null)
-            skipButton.onClick.AddListener(OnClickSkip);
-        if (startGameButton != null)
-            startGameButton.onClick.AddListener(OnClickStartGame);
-    }
-
-    private void CleanupButtons()
-    {
-        if (nextButton != null)
-            nextButton.onClick.RemoveListener(OnClickNext);
-        if (skipButton != null)
-            skipButton.onClick.RemoveListener(OnClickSkip);
-        if (startGameButton != null)
-            startGameButton.onClick.RemoveListener(OnClickStartGame);
-    }
-
-    /// <summary>
-    /// 次へボタンクリック時
-    /// </summary>
-    private void OnClickNext()
-    {
-        NextTutorialStep();
-    }
-
-    /// <summary>
-    /// スキップボタンクリック時
-    /// </summary>
-    private void OnClickSkip()
-    {
-        CompleteTutorial();
-    }
-
-    /// <summary>
-    /// ゲーム開始ボタンクリック時
-    /// </summary>
-    private void OnClickStartGame()
-    {
-        CompleteTutorial();
-    }
-
-    /// <summary>
-    /// 次のチュートリアルステップに進む
-    /// </summary>
-    public void NextTutorialStep()
-    {
-        currentStage++;
-
-        if (currentStage >= tutorialStageCount)
+        currentIndex++;
+        if (currentIndex < tutorialImages.Length)
+        {
+            tutorialImage.sprite = tutorialImages[currentIndex];
+            playImage.sprite = playImages[currentIndex];
+            
+        }
+        else
         {
             CompleteTutorial();
         }
@@ -96,19 +53,7 @@ public class TutorialPhaseController : PhaseController
     {
         RequestTransitionTo(GameState.Sleep);
     }
-
-
-    /// <summary>
-    /// 現在のステージを取得
-    /// </summary>
-    public int CurrentStage => currentStage;
-
-    /// <summary>
-    /// チュートリアルの進捗度を取得 (0~1)
-    /// </summary>
-    public float GetTutorialProgress()
-    {
-        return (float)currentStage / tutorialStageCount;
-    }
+    
 }
+
 
