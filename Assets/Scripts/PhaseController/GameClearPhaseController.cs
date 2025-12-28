@@ -19,6 +19,7 @@ public class GameClearPhaseController : PhaseController
     [SerializeField] private GameObject remainingTimeMinObject;
     [SerializeField] private TextMeshProUGUI awakeCountText;
     [SerializeField] private Button titleButton;
+    [SerializeField] private CheckWatchAnimationController animationController;
 
     public override GameState PhaseType => GameState.GameClear;
 
@@ -42,13 +43,26 @@ public class GameClearPhaseController : PhaseController
     private void SetupButtons()
     {
         if (titleButton != null)
+        {
             titleButton.onClick.AddListener(OnBackToTitle);
+            titleButton.enabled = false;
+
+            animationController.OnEnterAnimationCompleted += () =>
+            {
+                titleButton.enabled = true;
+            };
+        }
+            
     }
 
     private void CleanupButtons()
     {
         if (titleButton != null)
             titleButton.onClick.RemoveListener(OnBackToTitle);
+        
+        // eventに登録されたすべてのデリゲートをクリア
+        if (animationController != null)
+            animationController.ClearEnterAnimationCompletedEvent();
     }
 
     private void DisplayResult()
@@ -91,4 +105,3 @@ public class GameClearPhaseController : PhaseController
         RequestTransitionTo(GameState.Title);
     }
 }
-

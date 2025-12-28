@@ -64,8 +64,8 @@ public class CheckWatchAnimationController : MonoBehaviour
 
     private Coroutine _currentAnimationCoroutine;
     
-    public System.Action OnEnterAnimationComplete;
-    public System.Action OnExitAnimationComplete;
+    public event System.Action OnEnterAnimationCompleted;
+    public event System.Action OnExitAnimationCompleted;
 
     private void Awake()
     {
@@ -145,7 +145,7 @@ public class CheckWatchAnimationController : MonoBehaviour
         }
         
         ResetToStartState(enterAnimationSteps);
-        _currentAnimationCoroutine = StartCoroutine(PlayAnimationSequence(enterAnimationSteps, OnEnterAnimationComplete));
+        _currentAnimationCoroutine = StartCoroutine(PlayEnterSequence());
     }
     
     /// <summary>
@@ -159,7 +159,7 @@ public class CheckWatchAnimationController : MonoBehaviour
         }
         
         ResetToStartState(exitAnimationSteps);
-        _currentAnimationCoroutine = StartCoroutine(PlayAnimationSequence(exitAnimationSteps, OnExitAnimationComplete));
+        _currentAnimationCoroutine = StartCoroutine(PlayExitSequence());
     }
 
     /// <summary>
@@ -200,9 +200,27 @@ public class CheckWatchAnimationController : MonoBehaviour
     }
     
     /// <summary>
+    /// 入場アニメーションシーケンス
+    /// </summary>
+    private IEnumerator PlayEnterSequence()
+    {
+        yield return PlayAnimationSequence(enterAnimationSteps);
+        OnEnterAnimationCompleted?.Invoke();
+    }
+    
+    /// <summary>
+    /// 退場アニメーションシーケンス
+    /// </summary>
+    private IEnumerator PlayExitSequence()
+    {
+        yield return PlayAnimationSequence(exitAnimationSteps);
+        OnExitAnimationCompleted?.Invoke();
+    }
+    
+    /// <summary>
     /// アニメーションシーケンスを順番に再生
     /// </summary>
-    private IEnumerator PlayAnimationSequence(AnimationStep[] steps, System.Action onComplete)
+    private IEnumerator PlayAnimationSequence(AnimationStep[] steps)
     {
         Tween lastTween = null;
         
@@ -218,17 +236,17 @@ public class CheckWatchAnimationController : MonoBehaviour
             yield return new WaitForSeconds(step.delay);
             
             // アニメーション再生
-            var transform = step.targetObject.transform;
+            var stepTransform = step.targetObject.transform;
             
             switch (step.type)
             {
                 case AnimationType.SlideIn:
-                    lastTween = transform.DOLocalMove(step.runtimeEndPosition, step.duration)
+                    lastTween = stepTransform.DOLocalMove(step.runtimeEndPosition, step.duration)
                         .SetEase(step.easeType);
                     break;
                     
                 case AnimationType.ScaleIn:
-                    lastTween = transform.DOScale(step.runtimeEndScale, step.duration)
+                    lastTween = stepTransform.DOScale(step.runtimeEndScale, step.duration)
                         .SetEase(step.easeType);
                     break;
                     
@@ -241,7 +259,7 @@ public class CheckWatchAnimationController : MonoBehaviour
                     break;
                     
                 case AnimationType.SlideAndFade:
-                    transform.DOLocalMove(step.runtimeEndPosition, step.duration)
+                    stepTransform.DOLocalMove(step.runtimeEndPosition, step.duration)
                         .SetEase(step.easeType);
                     if (step.canvasGroup != null)
                     {
@@ -251,7 +269,7 @@ public class CheckWatchAnimationController : MonoBehaviour
                     break;
                     
                 case AnimationType.ScaleAndFade:
-                    transform.DOScale(step.runtimeEndScale, step.duration)
+                    stepTransform.DOScale(step.runtimeEndScale, step.duration)
                         .SetEase(step.easeType);
                     if (step.canvasGroup != null)
                     {
@@ -269,7 +287,6 @@ public class CheckWatchAnimationController : MonoBehaviour
         }
         
         _currentAnimationCoroutine = null;
-        onComplete?.Invoke();
     }
     
     /// <summary>
@@ -335,5 +352,30 @@ public class CheckWatchAnimationController : MonoBehaviour
                 }
             }
         }
+    }
+    
+    /// <summary>
+    /// 入場アニメーション完了イベントをクリア
+    /// </summary>
+    public void ClearEnterAnimationCompletedEvent()
+    {
+        OnEnterAnimationCompleted = null;
+    }
+    
+    /// <summary>
+    /// 退場アニメーション完了イベントをクリア
+    /// </summary>
+    public void ClearExitAnimationCompletedEvent()
+    {
+        OnExitAnimationCompleted = null;
+    }
+    
+    /// <summary>
+    /// すべてのアニメーション完了イベントをクリア
+    /// </summary>
+    public void ClearAllAnimationEvents()
+    {
+        OnEnterAnimationCompleted = null;
+        OnExitAnimationCompleted = null;
     }
 }
