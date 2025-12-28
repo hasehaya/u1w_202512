@@ -18,7 +18,6 @@ public class GameClearPhaseController : PhaseController
     [SerializeField] private TextMeshProUGUI remainingTimeSecText;
     [SerializeField] private GameObject remainingTimeMinObject;
     [SerializeField] private TextMeshProUGUI awakeCountText;
-    [SerializeField] private Button retryButton;
     [SerializeField] private Button titleButton;
     [SerializeField] private Button retryButton;
     [SerializeField] private CheckWatchAnimationController animationController;
@@ -147,15 +146,6 @@ public class GameClearPhaseController : PhaseController
             if (rankSprite != null)
                 rankImage.sprite = rankSprite;
         }
-    }
-
-    private void OnRetry()
-    {
-        if (AudioManager.Instance != null)
-        {
-            AudioManager.Instance.PlaySe(SeType.ButtonClick);
-        }
-        RequestTransitionTo(GameState.Sleep);
     }
 
     private void OnBackToTitle()
