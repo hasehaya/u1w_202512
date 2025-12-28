@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 /// <summary>
 /// ゲームクリア画面フェーズコントローラー
@@ -8,26 +9,20 @@ using UnityEngine.UI;
 public class GameClearPhaseController : PhaseController
 {
     [Header("UI References")]
-    [SerializeField] private Text scoreText;
-    [SerializeField] private Text resultText;
-    [SerializeField] private Text sleepTimeText;
-    [SerializeField] private Text remainingTimeText;
-    [SerializeField] private Button retryButton;
+    [SerializeField] private TextMeshProUGUI scoreText;
+    [SerializeField] private TextMeshProUGUI sleepTimeMinText;
+    [SerializeField] private TextMeshProUGUI sleepTimeSecText;
+    [SerializeField] private GameObject sleepTimeMinObject;
+    [SerializeField] private TextMeshProUGUI remainingTimeMinText;
+    [SerializeField] private TextMeshProUGUI remainingTimeSecText;
+    [SerializeField] private GameObject remainingTimeMinObject;
+    [SerializeField] private TextMeshProUGUI awakeCountText;
     [SerializeField] private Button titleButton;
-
-    private float sleepDuration;
-    private int score;
 
     public override GameState PhaseType => GameState.GameClear;
 
     protected override void OnEnterImpl()
     {
-        // デバッグ用
-        RequestTransitionTo(GameState.Title);
-        
-        // GameManagerから直接データを取得
-        score = GameManager.Instance.Data.Score();
-        
         SetupButtons();
         DisplayResult();
     }
@@ -44,16 +39,12 @@ public class GameClearPhaseController : PhaseController
 
     private void SetupButtons()
     {
-        if (retryButton != null)
-            retryButton.onClick.AddListener(OnRetry);
         if (titleButton != null)
             titleButton.onClick.AddListener(OnBackToTitle);
     }
 
     private void CleanupButtons()
     {
-        if (retryButton != null)
-            retryButton.onClick.RemoveListener(OnRetry);
         if (titleButton != null)
             titleButton.onClick.RemoveListener(OnBackToTitle);
     }
@@ -61,34 +52,41 @@ public class GameClearPhaseController : PhaseController
     private void DisplayResult()
     {
         if (scoreText != null)
-            scoreText.text = $"Score: {score}";
+            scoreText.text = $"{GameManager.Instance.Data.Score()}";
 
-        if (resultText != null)
+        if (remainingTimeMinText != null && remainingTimeSecText != null)
         {
-            resultText.text = "Game Clear!";
-            resultText.color = Color.green;
+            int remainingTime = (int)GameManager.Instance.Data.RemainingTime;
+            int minutes = remainingTime / 60;
+            int seconds = remainingTime % 60;
+            remainingTimeMinText.text = $"{minutes:D2}";
+            remainingTimeSecText.text = $"{seconds:D2}";
+            
+            // 分が0の時は分のGameObjectを非表示
+            if (remainingTimeMinObject != null)
+                remainingTimeMinObject.SetActive(minutes > 0);
         }
-
-        if (sleepTimeText != null)
-            sleepTimeText.text = $"{sleepDuration:F2}s";
-
-        if (remainingTimeText != null)
-            remainingTimeText.text = $"{GameManager.Instance.Data.RemainingTime:F2}s";
-    }
-
-    private void OnRetry()
-    {
-        RequestTransitionTo(GameState.Sleep);
+        
+        if (sleepTimeMinText != null && sleepTimeSecText != null)
+        {
+            int sleepTime = GameData.TotalTimeLimit - (int)GameManager.Instance.Data.RemainingTime;
+            int minutes = sleepTime / 60;
+            int seconds = sleepTime % 60;
+            sleepTimeMinText.text = $"{minutes:D2}";
+            sleepTimeSecText.text = $"{seconds:D2}";
+            
+            // 分が0の時は分のGameObjectを非表示
+            if (sleepTimeMinObject != null)
+                sleepTimeMinObject.SetActive(minutes > 0);
+        }
+        
+        if (awakeCountText != null)
+            awakeCountText.text = $"{GameManager.Instance.Data.CheckCount}";
     }
 
     private void OnBackToTitle()
     {
         RequestTransitionTo(GameState.Title);
     }
-
-    /// <summary>
-    /// スコア
-    /// </summary>
-    public int Score => score;
 }
 
