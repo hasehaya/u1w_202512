@@ -123,7 +123,7 @@ public class RunPhaseController : PhaseController
         // 遷移中はタイマーを停止
         if (!isTransitioning)
         {
-            GameManager.Instance.Data.RemainingTime -= Time.deltaTime;
+            GameManager.Instance.Data.RemainingTime -= 60 * Time.deltaTime;
         }
         
         UpdateTimerUI();
@@ -292,7 +292,7 @@ public class RunPhaseController : PhaseController
     private void UpdateTimerUI()
     {
         if (timerText != null)
-            timerText.text = Mathf.Max(0, GameManager.Instance.Data.RemainingTime).ToString("F2");
+            timerText.text = Mathf.Max(0, (int)GameManager.Instance.Data.RemainingTime / 60).ToString();
     }
 
     /// <summary>

@@ -12,7 +12,31 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 96276bfc63e94c8f97ebdb5c67abddfa, type: 3}
   m_Name: AudioClipData
   m_EditorClassIdentifier: Assembly-CSharp::AudioClipData
-  bgmClips: []
-  seClips: []
+  bgmClips:
+  - bgmType: 1
+    clip: {fileID: 8300000, guid: 985799c4253667f45acd40696e8b9a6f, type: 3}
+    volume: 0.7
+    loop: 1
+    fadeInDuration: 0
+    fadeOutDuration: 0
+  - bgmType: 5
+    clip: {fileID: 8300000, guid: 9a843e94c30590341a3dd2f9e5f62fa6, type: 3}
+    volume: 0.7
+    loop: 1
+    fadeInDuration: 0
+    fadeOutDuration: 0
+  seClips:
+  - seType: 2
+    clip: {fileID: 8300000, guid: 834b3a093046cfc4b9cf2004c33c866d, type: 3}
+    volume: 0.7
+  - seType: 5
+    clip: {fileID: 8300000, guid: f258132ac42f57340a663ebe4a357dba, type: 3}
+    volume: 0.7
+  - seType: 1
+    clip: {fileID: 8300000, guid: 289469256ed448b40b3ef869c5bcfe39, type: 3}
+    volume: 0.7
+  - seType: 6
+    clip: {fileID: 8300000, guid: e5cb498ce510a5d49bda18f6c8ee03f8, type: 3}
+    volume: 0.7
   masterBGMVolume: 1
   masterSeVolume: 1
