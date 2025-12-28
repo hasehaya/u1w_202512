@@ -579,10 +579,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: SetTimer
       objectReference: {fileID: 0}
-    - target: {fileID: 1814299976502282117, guid: 157cda8bcedf7ee49b4d794def441024, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 6705199111449112926, guid: 157cda8bcedf7ee49b4d794def441024, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
