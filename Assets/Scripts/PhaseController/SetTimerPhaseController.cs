@@ -42,6 +42,7 @@ public class SetTimerPhaseController : PhaseController
         };
         slideSetController.OnExitAnimationCompleted += () =>
         {
+            AudioManager.Instance.StopBGM();
             StartCoroutine(ChangeStateToAlarmRing());
         };
         alarmRingController.OnEnterAnimationCompleted += () =>
@@ -53,6 +54,8 @@ public class SetTimerPhaseController : PhaseController
             GameManager.Instance.ChangeState(GameState.Sleep);
         };
         
+        if(!AudioManager.Instance.IsBGMPlaying())
+            AudioManager.Instance.PlayBGM(BGMType.Prologue);
         
         slideSet.SetActive(true);
         alarmRing.SetActive(false);
@@ -77,6 +80,7 @@ public class SetTimerPhaseController : PhaseController
     {
         if (direction == SwipeDirection.Right)
         {
+            AudioManager.Instance.PlaySe(SeType.PhoneSwipe);
             slideSetController.PlayExitAnimation();
             InputManager.Instance.OnSwipe -= OnSwiped;
         }

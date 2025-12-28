@@ -98,6 +98,7 @@ public class SleepPhaseController : PhaseController
             checkButton.image.sprite = checkButtonSprites[remainingCheckCount - 1];
             checkButton.enabled = true;
             timeDecreaseRate = Random.Range(decreaseRateRange.x, decreaseRateRange.y);
+            AudioManager.Instance.PlayBGM(BGMType.Sleep);
             sleepGameState = SleepGameState.Dream;
         };
         wakeUpController.OnEnterAnimationCompleted += () =>
@@ -107,6 +108,7 @@ public class SleepPhaseController : PhaseController
         
         
         Initialize();
+        AudioManager.Instance.PlayBGM(BGMType.Sleep);
         sleepGameState = SleepGameState.Dream;
         dream.SetActive(true);
         checkButton.image.sprite = checkButtonSprites[remainingCheckCount - 1];
@@ -122,6 +124,7 @@ public class SleepPhaseController : PhaseController
             
         if (gameData.RemainingTime <= 0)
         {
+            AudioManager.Instance.StopBGM();
             RequestTransitionTo(GameState.GameOver);
         }
     }
@@ -166,10 +169,11 @@ public class SleepPhaseController : PhaseController
                 remainingCheckCount--;
                 gameData.CheckCount++;
                 SetPopUpState(gameData.RemainingTime, remainingCheckCount == 0);
-                
+                AudioManager.Instance.StopBGM();
                 sleepGameState = SleepGameState.CheckWatch;
                 break;
             case SleepGameState.WakeUp:
+                AudioManager.Instance.StopBGM();
                 AudioManager.Instance.PlaySe(SeType.Gaba);
                 wakeUp.SetActive(true);
                 sleepGameState = SleepGameState.WakeUp;

@@ -33,6 +33,7 @@ public class GameClearPhaseController : PhaseController
 
     protected override void OnEnterImpl()
     {
+        AudioManager.Instance.PlayBGM(BGMType.GameClear);
         UnityroomApiClient.Instance.SendScore(1, GameManager.Instance.Data.Score(), ScoreboardWriteMode.HighScoreDesc);
         SetupButtons();
         DisplayResult();
@@ -45,6 +46,7 @@ public class GameClearPhaseController : PhaseController
 
     protected override void OnExitImpl()
     {
+        AudioManager.Instance.StopBGM();
         CleanupButtons();
     }
 

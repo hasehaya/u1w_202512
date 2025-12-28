@@ -44,10 +44,11 @@ public enum SeType
     ButtonClick = 1,
     Swipe = 2,
     Collision = 3,
-    Attention = 4,
+    PhoneSwipe = 4,
     Run = 5,
     Train = 6,
     Gaba = 7,
     Alarm = 8,
+    GameOver = 9,
 }
 

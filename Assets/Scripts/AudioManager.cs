@@ -109,12 +109,14 @@ public class AudioManager : MonoBehaviour
     /// <summary>
     /// BGMを停止（フェードアウト付き）
     /// </summary>
-    public void StopBGM(float fadeOutDuration = 1f)
+    public void StopBGM()
     {
         if (_bgmFadeCoroutine != null)
         {
             StopCoroutine(_bgmFadeCoroutine);
         }
+        
+        float fadeOutDuration = audioClipData.GetBGMClipInfo(_currentBGMType)?.fadeOutDuration ?? 0f;
 
         _bgmFadeCoroutine = StartCoroutine(FadeOutBGM(fadeOutDuration));
     }

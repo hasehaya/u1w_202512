@@ -57,6 +57,8 @@ public class ProloguePhaseController : PhaseController
     
     private void OnScreenTapped()
     {
+        AudioManager.Instance.PlaySe(SeType.ButtonClick);
+        
         if (_isTyping)
         {
             // タイピング中なら即座に全文表示

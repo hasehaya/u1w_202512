@@ -36,6 +36,8 @@ public class TutorialPhaseController : PhaseController
 
     private void OnScreenTapped()
     {
+        AudioManager.Instance.PlaySe(SeType.ButtonClick);
+        
         currentIndex++;
         if (currentIndex < tutorialImages.Length)
         {

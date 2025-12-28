@@ -26,6 +26,8 @@ public class GameOverPhaseController : PhaseController
     {
         SetupButtons();
         PlayThrowAnimation();
+        
+        AudioManager.Instance.PlaySe(SeType.GameOver);
     }
 
     public override void UpdatePhase()
@@ -41,6 +43,7 @@ public class GameOverPhaseController : PhaseController
         {
             characterObject.transform.DOKill();
         }
+        AudioManager.Instance.StopAllSe();
     }
 
     /// <summary>

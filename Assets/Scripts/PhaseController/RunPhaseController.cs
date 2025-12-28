@@ -119,6 +119,8 @@ public class RunPhaseController : PhaseController
 
         if (tapButton != null)
             tapButton.interactable = true;
+        
+        AudioManager.Instance.PlayBGM(BGMType.Run);
 
         GenerateObstacleTriggers();
     }
@@ -148,6 +150,8 @@ public class RunPhaseController : PhaseController
     {
         if(player != null)
             player.OnExit();
+        
+        AudioManager.Instance.StopBGM();
         
         progress = 0;
         obstacleTriggers.Clear();

@@ -1733,7 +1733,7 @@ MonoBehaviour:
   - {fileID: 7301598544391111442}
   - {fileID: 316137038127960245}
   decreaseRateRange: {x: 45, y: 120}
-  popUpStateThreshold: {x: 300, y: 100}
+  popUpStateThreshold: {x: 1100, y: 700}
   transitionDurationToRunPhase: 2
 --- !u!1 &7408665554664570340
 GameObject:
