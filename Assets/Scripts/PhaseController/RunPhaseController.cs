@@ -57,6 +57,11 @@ public class RunPhaseController : PhaseController
         {
             InputManager.Instance.OnSwipe += HandleSwipe;
         }
+        
+        if (obstacleManager != null)
+        {
+            obstacleManager.OnObstacleDisplayed += HandleObstacleDisplayed;
+        }
     }
 
     private void UnsubscribeFromInputEvents()
@@ -69,6 +74,11 @@ public class RunPhaseController : PhaseController
         if (InputManager.Instance != null)
         {
             InputManager.Instance.OnSwipe -= HandleSwipe;
+        }
+        
+        if (obstacleManager != null)
+        {
+            obstacleManager.OnObstacleDisplayed -= HandleObstacleDisplayed;
         }
     }
 
@@ -135,6 +145,22 @@ public class RunPhaseController : PhaseController
         
         // プレイヤーの移動はPlayerControllerが自動で処理
         // ここでは何もしない（衝突判定はUpdatePhaseで行う）
+    }
+    
+    /// <summary>
+    /// 障害物が実際に画面に表示された時に呼ばれる
+    /// </summary>
+    private void HandleObstacleDisplayed()
+    {
+        // セーフタイムを開始
+        isInSafeTime = true;
+        
+        // 一定時間後にセーフタイムを終了
+        Invoke(nameof(EndSafeTime), safeTimeDuration);
+        
+        // 障害物の削除は別途管理（セーフタイムとは独立）
+        // 必要に応じて障害物のアニメーション時間を考慮した削除を追加可能
+        Invoke(nameof(DespawnObstacle), safeTimeDuration + 0.5f);
     }
 
     private void CheckCollision()
@@ -211,17 +237,11 @@ public class RunPhaseController : PhaseController
         int posIndex = Random.Range(0, 4);
         ObstaclePosition pos = (posIndex < 2) ? ObstaclePosition.Left : ObstaclePosition.Right;
         
-        obstacleManager.Spawn(pos, posIndex);
-
-        // セーフタイムを開始
-        isInSafeTime = true;
+        // 障害物生成をリクエスト（キューに追加される可能性がある）
+        obstacleManager.Spawn(pos);
         
-        // 一定時間後にセーフタイムを終了
-        Invoke(nameof(EndSafeTime), safeTimeDuration);
-        
-        // 障害物の削除は別途管理（セーフタイムとは独立）
-        // 必要に応じて障害物のアニメーション時間を考慮した削除を追加可能
-        Invoke(nameof(DespawnObstacle), safeTimeDuration + 1f);
+        // セーフタイムの設定は HandleObstacleDisplayed() で行う
+        // 障害物の削除タイミングの設定もそちらで行う
     }
 
     /// <summary>
@@ -272,6 +292,12 @@ public class RunPhaseController : PhaseController
 
         // セーフタイムを設定（連続で当たり判定が発生しないようにする）
         isInSafeTime = true;
+        
+        // 障害物を削除
+        if (obstacleManager != null)
+        {
+            obstacleManager.Hide();
+        }
     }
 
     /// <summary>
@@ -287,6 +313,9 @@ public class RunPhaseController : PhaseController
             {
                 isInputLocked = false;
                 inputLockTimer = 0f;
+                
+                // セーフタイムも解除
+                isInSafeTime = false;
 
                 // ボタンを再有効化
                 if (tapButton != null)

@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using unityroom.Api;
 
 /// <summary>
 /// ゲームクリア画面フェーズコントローラー
@@ -23,6 +24,7 @@ public class GameClearPhaseController : PhaseController
 
     protected override void OnEnterImpl()
     {
+        UnityroomApiClient.Instance.SendScore(1, GameManager.Instance.Data.Score(), ScoreboardWriteMode.HighScoreDesc);
         SetupButtons();
         DisplayResult();
     }

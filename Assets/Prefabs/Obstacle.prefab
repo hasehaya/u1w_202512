@@ -89,8 +89,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Obstacle
   rectTransform: {fileID: 3466976675903908907}
+  obstacleImage: {fileID: 9141425384717364163}
   leftStartPos: {x: -700, y: 0}
   leftEndPos: {x: -280, y: 0}
   rightStartPos: {x: 700, y: 0}
   rightEndPos: {x: 280, y: 0}
-  moveDuration: 0.84
+  moveDuration: 0.78
+  obstacleSprites:
+  - {fileID: -2555302910234150524, guid: d82710be8a5160947b67cce519bf9b84, type: 3}
+  - {fileID: -3225273479725380065, guid: f513663576944d046b28b1f42501721b, type: 3}
+  - {fileID: 443137461210304011, guid: a11e6c0811b7f744087d0da688b87bcc, type: 3}

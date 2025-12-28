@@ -823,7 +823,7 @@ MonoBehaviour:
   sprite1: {fileID: -4483706059431499340, guid: 0b7ed42210515d742ae36b0474a7c92e, type: 3}
   sprite2: {fileID: -469836816148426084, guid: a35a4bdc70d4a3845957d3a67b82c8a5, type: 3}
   spriteChangeInterval: 0.59
-  autoReturnDelay: 2
+  autoReturnDelay: 1.9
   damageColor: {r: 1, g: 0, b: 0, a: 1}
   blinkDuration: 0.2
   blinkCount: 5
@@ -972,7 +972,7 @@ MonoBehaviour:
   player: {fileID: 7649075779364409779}
   obstacleManager: {fileID: 3352576730510167999}
   requiredClicks: 100
-  safeTimeDuration: 2
+  safeTimeDuration: 1.4
   minObstacles: 3
   maxObstacles: 5
   collisionPenaltyDuration: 3

@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
+using System;
 
 /// <summary>
 /// 障害物のUI表示（ヒントテキスト、矢印）とPrefabからの生成を管理
@@ -21,68 +23,87 @@ public class ObstacleManager : MonoBehaviour
     
     private Obstacle currentObstacle;
     private Coroutine spawnCoroutine;
+    private Queue<ObstacleSpawnRequest> spawnQueue = new Queue<ObstacleSpawnRequest>();
+    private bool isSpawning;
 
     public ObstaclePosition CurrentPosition => currentObstacle != null ? currentObstacle.CurrentPosition : ObstaclePosition.Left;
     public bool IsActive => currentObstacle != null && currentObstacle.IsActive;
+    
+    /// <summary>
+    /// 障害物が実際に画面に表示された時に発火するイベント
+    /// </summary>
+    public event Action OnObstacleDisplayed;
+
+    /// <summary>
+    /// 障害物生成リクエストを保持する構造体
+    /// </summary>
+    private struct ObstacleSpawnRequest
+    {
+        public ObstaclePosition pos;
+
+        public ObstacleSpawnRequest(ObstaclePosition pos)
+        {
+            this.pos = pos;
+        }
+    }
 
     /// <summary>
     /// 障害物をPrefabから生成して表示
     /// </summary>
     /// <param name="pos">左右の位置</param>
-    /// <param name="posIndex">0: Left Start, 1: Left End, 2: Right Start, 3: Right End</param>
-    public void Spawn(ObstaclePosition pos, int posIndex)
+    public void Spawn(ObstaclePosition pos)
     {
         if (obstaclePrefab == null) return;
 
-        // 既存のコルーチンをキャンセル
-        if (spawnCoroutine != null)
+        // 障害物生成中の場合はキューに追加
+        if (isSpawning || currentObstacle != null)
         {
-            StopCoroutine(spawnCoroutine);
+            spawnQueue.Enqueue(new ObstacleSpawnRequest(pos));
+            return;
         }
 
-        // 既存の障害物があれば破棄
-        if (currentObstacle != null)
-        {
-            Destroy(currentObstacle.gameObject);
-            currentObstacle = null;
-        }
+        // 生成を開始
+        StartSpawn(pos);
+    }
+
+    /// <summary>
+    /// 実際に障害物を生成する内部メソッド
+    /// </summary>
+    private void StartSpawn(ObstaclePosition pos)
+    {
+        isSpawning = true;
         
         // Attention表示→矢印表示→Obstacleを生成するコルーチンを開始
-        spawnCoroutine = StartCoroutine(SpawnSequence(pos, posIndex));
+        spawnCoroutine = StartCoroutine(SpawnSequence(pos));
     }
 
     /// <summary>
     /// Attention表示→点滅→消去→矢印表示→Obstacle生成のシーケンス
     /// </summary>
-    private IEnumerator SpawnSequence(ObstaclePosition pos, int posIndex)
+    private IEnumerator SpawnSequence(ObstaclePosition pos)
     {
-        // Attentionと同時に矢印を表示
-        ShowArrow(pos);
-        
         // Attention表示
-        if (attentionObject != null)
+        ShowArrow(pos);
+        attentionObject.SetActive(true);
+        
+        // 点滅アニメーション
+        CanvasGroup attentionCanvasGroup = attentionObject.GetComponent<CanvasGroup>();
+        if (attentionCanvasGroup == null)
         {
-            attentionObject.SetActive(true);
-            
-            // 点滅アニメーション
-            CanvasGroup attentionCanvasGroup = attentionObject.GetComponent<CanvasGroup>();
-            if (attentionCanvasGroup == null)
-            {
-                attentionCanvasGroup = attentionObject.AddComponent<CanvasGroup>();
-            }
-
-            float blinkInterval = attentionBlinkDuration / (attentionBlinkCount * 2);
-            for (int i = 0; i < attentionBlinkCount; i++)
-            {
-                attentionCanvasGroup.alpha = 0f;
-                yield return new WaitForSeconds(blinkInterval);
-                attentionCanvasGroup.alpha = 1f;
-                yield return new WaitForSeconds(blinkInterval);
-            }
-            
-            // Attentionを消去
-            attentionObject.SetActive(false);
+            attentionCanvasGroup = attentionObject.AddComponent<CanvasGroup>();
         }
+
+        float blinkInterval = attentionBlinkDuration / (attentionBlinkCount * 2);
+        for (int i = 0; i < attentionBlinkCount; i++)
+        {
+            attentionCanvasGroup.alpha = 0f;
+            yield return new WaitForSeconds(blinkInterval);
+            attentionCanvasGroup.alpha = 1f;
+            yield return new WaitForSeconds(blinkInterval);
+        }
+        
+        // Attentionを消去
+        attentionObject.SetActive(false);
 
 
         // Obstacleを生成してスライドイン
@@ -93,11 +114,19 @@ public class ObstacleManager : MonoBehaviour
         {
             Debug.LogError("ObstaclePrefabにObstacleコンポーネントが見つかりません");
             Destroy(obstacleObj);
+            isSpawning = false;
+            ProcessNextInQueue();
             yield break;
         }
 
         // Obstacleをスライドインさせる（初期位置が始点）
         currentObstacle.Spawn(pos);
+        
+        // 生成完了
+        isSpawning = false;
+        
+        // 障害物が実際に表示されたことを通知
+        OnObstacleDisplayed?.Invoke();
     }
     
     /// <summary>
@@ -126,6 +155,24 @@ public class ObstacleManager : MonoBehaviour
             currentObstacle.Despawn();
             Destroy(currentObstacle.gameObject);
             currentObstacle = null;
+        }
+        
+        // フラグをリセット
+        isSpawning = false;
+        
+        // キューにある次のリクエストを処理
+        ProcessNextInQueue();
+    }
+    
+    /// <summary>
+    /// キューにある次の障害物生成リクエストを処理
+    /// </summary>
+    private void ProcessNextInQueue()
+    {
+        if (spawnQueue.Count > 0 && !isSpawning && currentObstacle == null)
+        {
+            ObstacleSpawnRequest request = spawnQueue.Dequeue();
+            StartSpawn(request.pos);
         }
     }
 
@@ -169,5 +216,9 @@ public class ObstacleManager : MonoBehaviour
             Destroy(currentObstacle.gameObject);
             currentObstacle = null;
         }
+        
+        // キューをクリア
+        spawnQueue.Clear();
     }
 }
+
