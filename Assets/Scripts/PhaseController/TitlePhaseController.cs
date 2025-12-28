@@ -7,11 +7,16 @@ using UnityEngine.UI;
 /// </summary>
 public class TitlePhaseController : PhaseController
 {
+    [SerializeField] private Button startButton;
+
     public override GameState PhaseType => GameState.Title;
 
     protected override void OnEnterImpl()
     {
-        InputManager.Instance.OnTap += OnScreenTapped;
+        if (startButton != null)
+        {
+            startButton.onClick.AddListener(GameStart);
+        }
     }
 
     public override void UpdatePhase()
@@ -21,20 +26,22 @@ public class TitlePhaseController : PhaseController
 
     protected override void OnExitImpl()
     {
-        InputManager.Instance.OnTap -= OnScreenTapped;
+        if (startButton != null)
+        {
+            startButton.onClick.RemoveListener(GameStart);
+        }
     }
 
     private void OnScreenTapped()
     {
-        Start();
+        GameStart();
     }
     
     /// <summary>
     /// スタートボタンクリック時
     /// </summary>
-    private void Start()
+    private void GameStart()
     {
         RequestTransitionTo(GameState.Loading);
     }
 }
-
