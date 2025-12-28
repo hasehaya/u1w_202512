@@ -62,7 +62,7 @@ public class SleepPhaseController : PhaseController
             ChangeState(SleepGameState.Dream);
         });
 
-        checkWatchController.OnEnterAnimationComplete += () =>
+        checkWatchController.OnEnterAnimationCompleted += () =>
         {
             wakeUpButton.enabled = true;
             backSleepButton.enabled = true;
@@ -70,7 +70,7 @@ public class SleepPhaseController : PhaseController
             if(remainingCheckCount == 0)
                 backSleepButton.interactable = false;
         };
-        checkWatchController.OnExitAnimationComplete += () =>
+        checkWatchController.OnExitAnimationCompleted += () =>
         {
             checkWatch.SetActive(false);
             dream.SetActive(true);
@@ -79,7 +79,7 @@ public class SleepPhaseController : PhaseController
             timeDecreaseRate = Random.Range(decreaseRateRange.x, decreaseRateRange.y);
             sleepGameState = SleepGameState.Dream;
         };
-        wakeUpController.OnEnterAnimationComplete += () =>
+        wakeUpController.OnEnterAnimationCompleted += () =>
         {
             StartCoroutine(TransitionToRun());
         };
@@ -107,6 +107,11 @@ public class SleepPhaseController : PhaseController
 
     protected override void OnExitImpl()
     {
+        checkWatchController.ClearAllAnimationEvents();
+        wakeUpController.ClearAllAnimationEvents();
+        checkButton.onClick.RemoveAllListeners();
+        wakeUpButton.onClick.RemoveAllListeners();
+        backSleepButton.onClick.RemoveAllListeners();
         StopAllCoroutines();
     }
 
