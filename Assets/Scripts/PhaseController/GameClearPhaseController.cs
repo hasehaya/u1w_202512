@@ -92,7 +92,7 @@ public class GameClearPhaseController : PhaseController
         
         if (sleepTimeMinText != null && sleepTimeSecText != null)
         {
-            int sleepTime = GameData.TotalTimeLimit - (int)GameManager.Instance.Data.RemainingTime;
+            int sleepTime = (int)GameManager.Instance.Data.SleepTime;
             int minutes = sleepTime / 60;
             int seconds = sleepTime % 60;
             sleepTimeMinText.text = $"{minutes:D2}";

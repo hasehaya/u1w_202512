@@ -39,6 +39,8 @@ public class SleepPhaseController : PhaseController
     public override GameState PhaseType => GameState.Sleep;
     
     private SleepGameState sleepGameState = SleepGameState.Dream;
+    
+    private float initialRemainingTime;
 
 
     private enum SleepGameState
@@ -53,6 +55,7 @@ public class SleepPhaseController : PhaseController
         remainingCheckCount = checkButtonSprites.Length;
         GameManager.Instance.Data.Reset();
         gameData = GameManager.Instance.Data;
+        initialRemainingTime = gameData.RemainingTime; // 寝る前の初期時間を記録
         
         checkWatchController = checkWatch.GetComponent<CheckWatchAnimationController>();
         wakeUpController = wakeUp.GetComponent<CheckWatchAnimationController>();
@@ -167,8 +170,11 @@ public class SleepPhaseController : PhaseController
                 sleepGameState = SleepGameState.CheckWatch;
                 break;
             case SleepGameState.WakeUp:
+                AudioManager.Instance.PlaySe(SeType.Gaba);
                 wakeUp.SetActive(true);
                 sleepGameState = SleepGameState.WakeUp;
+                // 寝た時間を計算して保存（初期時間 - 現在の残り時間 = 経過した時間）
+                gameData.SleepTime = initialRemainingTime - gameData.RemainingTime;
                 break;
         }
     }
