@@ -50,5 +50,6 @@ public enum SeType
     Gaba = 7,
     Alarm = 8,
     GameOver = 9,
+    Exclamation = 10,
 }
 
