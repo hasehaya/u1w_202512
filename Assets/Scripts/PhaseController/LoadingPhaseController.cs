@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using UnityEngine.UI;
+using UnityEngine;
 
 /// <summary>
 /// ローディング画面フェーズコントローラー
@@ -6,43 +7,50 @@
 /// </summary>
 public class LoadingPhaseController : PhaseController
 {
-    [SerializeField] private float loadingDuration = 2f;
+    [SerializeField] private Sprite[] images;
+    [SerializeField] private Image loadingImage;
+    [SerializeField] private float interval = 0.5f; // 画像切り替え間隔（秒）
+    [SerializeField] private float loadingDuration = 3.0f; // ローディング画面の表示時間（秒）
     
-    private float loadingTimer = 0f;
+    private float passedTime;
+    private float elapsedTime;
+    private int currentImageIndex;
 
     public override GameState PhaseType => GameState.Loading;
 
     protected override void OnEnterImpl()
     {
-        loadingTimer = 0f;
+        loadingImage.sprite = images[0];
+        elapsedTime = 0f;
+        currentImageIndex = 0;
+        passedTime = 0f;
     }
 
     public override void UpdatePhase()
     {
-        loadingTimer += Time.deltaTime;
-
-        if (loadingTimer >= loadingDuration)
+        elapsedTime += Time.deltaTime;
+        passedTime += Time.deltaTime;
+        if (passedTime >= loadingDuration)
         {
             CompleteLoading();
+            return;
+        }
+        if (elapsedTime >= interval)
+        {
+            elapsedTime = 0f;
+            currentImageIndex = (currentImageIndex + 1) % images.Length;
+            loadingImage.sprite = images[currentImageIndex];
         }
     }
-
+    
     protected override void OnExitImpl()
     {
-        loadingTimer = 0f;
+
     }
 
     private void CompleteLoading()
     {
         RequestTransitionTo(GameState.Prologue);
     }
-
-    /// <summary>
-    /// ローディング進捗の取得 (0~1)
-    /// </summary>
-    public float GetLoadingProgress()
-    {
-        return Mathf.Clamp01(loadingTimer / loadingDuration);
-    }
+    
 }
-

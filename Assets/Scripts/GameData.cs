@@ -9,5 +9,11 @@
         if (RemainingTime <= 0) return 0;
         return CheckCount + (int)RemainingTime;
     }
+    
+    public void Reset()
+    {
+        CheckCount = 0;
+        RemainingTime = TotalTimeLimit;
+    }
 }
 
