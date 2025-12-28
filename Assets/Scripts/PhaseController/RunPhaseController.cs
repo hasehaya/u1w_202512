@@ -136,6 +136,8 @@ public class RunPhaseController : PhaseController
         // 既存のアニメーションがあればキャンセル
         roadShakeTween?.Kill();
         
+        roadObject.anchoredPosition = new Vector2(0, 809);
+        
         // 小刻みな揺れ（RectTransformにはDOShakeAnchorPosを使用）
         roadShakeTween = roadObject
             .DOShakeAnchorPos(
