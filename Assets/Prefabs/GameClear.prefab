@@ -1248,7 +1248,6 @@ MonoBehaviour:
   remainingTimeSecText: {fileID: 8257507088982225481}
   remainingTimeMinObject: {fileID: 2211347178686496694}
   awakeCountText: {fileID: 381872902731330301}
-  retryButton: {fileID: 6225807933499479418}
   titleButton: {fileID: 7285729872611707808}
   retryButton: {fileID: 6225807933499479418}
   animationController: {fileID: 3355306300135228455}
@@ -1623,7 +1622,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &2924154754272638457
 RectTransform:
   m_ObjectHideFlags: 0

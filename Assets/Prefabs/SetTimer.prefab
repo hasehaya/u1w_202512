@@ -185,6 +185,29 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CheckWatchAnimationController
   enterAnimationSteps:
+  - stepName: KnobReset
+    targetObject: {fileID: 2206860593423316753}
+    type: 0
+    delay: 0
+    duration: 0
+    easeType: 5
+    startPosition: {x: -101, y: -89.5, z: 0}
+    endPosition: {x: -101, y: -89.5, z: 0}
+    useCurrentPositionAsStart: 0
+    useCurrentPositionAsEnd: 0
+    startScale: {x: 0, y: 0, z: 0}
+    endScale: {x: 0, y: 0, z: 0}
+    useCurrentScaleAsStart: 0
+    useCurrentScaleAsEnd: 0
+    startAlpha: 0
+    endAlpha: 0
+    runtimeStartPosition: {x: 0, y: 0, z: 0}
+    runtimeEndPosition: {x: 0, y: 0, z: 0}
+    runtimeStartScale: {x: 0, y: 0, z: 0}
+    runtimeEndScale: {x: 0, y: 0, z: 0}
+    canvasGroup: {fileID: 0}
+    image: {fileID: 0}
+    isInitialized: 0
   - stepName: FrameUpperReset
     targetObject: {fileID: 6801338270592414365}
     type: 0
@@ -261,7 +284,7 @@ MonoBehaviour:
     delay: 0
     duration: 0.3
     easeType: 6
-    startPosition: {x: -108, y: -89.5, z: 0}
+    startPosition: {x: -101, y: -89.5, z: 0}
     endPosition: {x: 113, y: -89.5, z: 0}
     useCurrentPositionAsStart: 0
     useCurrentPositionAsEnd: 0
