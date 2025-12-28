@@ -878,7 +878,7 @@ MonoBehaviour:
   rectTransform: {fileID: 3982442697804547758}
   leftPositionX: -500
   rightPositionX: 500
-  centerPositionY: 0
+  centerPositionY: 92
   moveDuration: 0.3
   sprite1: {fileID: -4483706059431499340, guid: 0b7ed42210515d742ae36b0474a7c92e, type: 3}
   sprite2: {fileID: -469836816148426084, guid: a35a4bdc70d4a3845957d3a67b82c8a5, type: 3}
@@ -1028,6 +1028,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5310cd8d99c64fcda85e3aa89368a357, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RunPhaseController
+  roadObject: {fileID: 7686581093167114461}
   timerText: {fileID: 6751562376718241715}
   progressBar: {fileID: 7470723802204947645}
   tapButton: {fileID: 3809331050987634197}

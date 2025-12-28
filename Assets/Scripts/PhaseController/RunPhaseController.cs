@@ -12,6 +12,7 @@ using Unity.VisualScripting;
 public class RunPhaseController : PhaseController
 {
     [Header("UI")]
+    [SerializeField] private RectTransform roadObject;
     [SerializeField] private TextMeshProUGUI timerText;
     [SerializeField] private Slider progressBar;
     [SerializeField] private Button tapButton;
@@ -40,6 +41,7 @@ public class RunPhaseController : PhaseController
     private bool isInputLocked;
     private float inputLockTimer;
     private bool isTransitioning;
+    private Tween roadShakeTween;
 
     public override GameState PhaseType => GameState.Run;
 
@@ -121,6 +123,45 @@ public class RunPhaseController : PhaseController
             tapButton.interactable = true;
 
         GenerateObstacleTriggers();
+        StartRoadShake();
+    }
+    
+    /// <summary>
+    /// 道路オブジェクトを小刻みに揺らすアニメーションを開始
+    /// </summary>
+    private void StartRoadShake()
+    {
+        if (roadObject == null) return;
+        
+        // 既存のアニメーションがあればキャンセル
+        roadShakeTween?.Kill();
+        
+        // 小刻みな揺れ（RectTransformにはDOShakeAnchorPosを使用）
+        roadShakeTween = roadObject
+            .DOShakeAnchorPos(
+                duration: 2f,
+                strength: 10f, // 揺れの強さ
+                vibrato: 5, // 揺れの頻度（高いほど細かく揺れる）
+                randomness: 90, // ランダム性
+                snapping: false,
+                fadeOut: false
+            )
+            .SetLoops(-1, LoopType.Restart) // 無限ループ
+            .SetUpdate(true);
+    }
+    
+    /// <summary>
+    /// 道路オブジェクトの揺れアニメーションを停止
+    /// </summary>
+    private void StopRoadShake()
+    {
+        roadShakeTween?.Kill();
+        roadShakeTween = null;
+        
+        if (roadObject != null)
+        {
+            roadObject.anchoredPosition = Vector2.zero;
+        }
     }
 
     public override void UpdatePhase()
@@ -148,6 +189,8 @@ public class RunPhaseController : PhaseController
     {
         if(player != null)
             player.OnExit();
+        
+        StopRoadShake();
         
         progress = 0;
         obstacleTriggers.Clear();
