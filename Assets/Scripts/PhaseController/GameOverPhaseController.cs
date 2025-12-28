@@ -10,7 +10,6 @@ public class GameOverPhaseController : PhaseController
 {
     [Header("UI References")] 
     [SerializeField] private GameObject characterObject;
-    [SerializeField] private GameObject gameOverTextObject;
     [SerializeField] private Button retryButton;
     [SerializeField] private Button titleButton;
     
@@ -81,18 +80,6 @@ public class GameOverPhaseController : PhaseController
                 rectTransform.DOAnchorPosY(targetPosition.y, timePerBounce / 2)
                     .SetEase(Ease.InQuad)
             );
-        }
-
-        // ゲームオーバーテキストのフェードイン（アニメーション完了後）
-        if (gameOverTextObject != null)
-        {
-            CanvasGroup canvasGroup = gameOverTextObject.GetComponent<CanvasGroup>();
-            if (canvasGroup == null)
-            {
-                canvasGroup = gameOverTextObject.AddComponent<CanvasGroup>();
-            }
-            canvasGroup.alpha = 0;
-            canvasGroup.DOFade(1f, 0.5f).SetDelay(moveDuration);
         }
     }
 
