@@ -18,6 +18,7 @@ public class GameClearPhaseController : PhaseController
     [SerializeField] private TextMeshProUGUI remainingTimeSecText;
     [SerializeField] private GameObject remainingTimeMinObject;
     [SerializeField] private TextMeshProUGUI awakeCountText;
+    [SerializeField] private Button retryButton;
     [SerializeField] private Button titleButton;
     [SerializeField] private CheckWatchAnimationController animationController;
     
@@ -49,6 +50,12 @@ public class GameClearPhaseController : PhaseController
 
     private void SetupButtons()
     {
+        if (retryButton != null)
+        {
+            retryButton.onClick.AddListener(OnRetry);
+            retryButton.enabled = false;
+        }
+            
         if (titleButton != null)
         {
             titleButton.onClick.AddListener(OnBackToTitle);
@@ -56,6 +63,8 @@ public class GameClearPhaseController : PhaseController
 
             animationController.OnEnterAnimationCompleted += () =>
             {
+                if (retryButton != null)
+                    retryButton.enabled = true;
                 titleButton.enabled = true;
             };
         }
@@ -64,6 +73,8 @@ public class GameClearPhaseController : PhaseController
 
     private void CleanupButtons()
     {
+        if (retryButton != null)
+            retryButton.onClick.RemoveListener(OnRetry);
         if (titleButton != null)
             titleButton.onClick.RemoveListener(OnBackToTitle);
         
@@ -122,6 +133,15 @@ public class GameClearPhaseController : PhaseController
             if (rankSprite != null)
                 rankImage.sprite = rankSprite;
         }
+    }
+
+    private void OnRetry()
+    {
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlaySe(SeType.ButtonClick);
+        }
+        RequestTransitionTo(GameState.Sleep);
     }
 
     private void OnBackToTitle()
